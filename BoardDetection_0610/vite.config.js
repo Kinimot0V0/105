@@ -21,14 +21,5 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  base: './',
-  server: {
-    proxy: {
-      '/proxy-api': {
-        target: 'http://10.65.198.7:8090',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/proxy-api/, '')
-      }
-    }
-  }
+  base: './'
 })
