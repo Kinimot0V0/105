@@ -223,10 +223,16 @@ const getWarningData = async () => {
     )
     warningList.value = updatedWarnings
 
-    // warningList.value = data.result.warningList
-    totalCount.value = data.result.total_count
-    page.value = data.result.page
-    totalPages.value = data.result.total_pages
+    // // warningList.value = data.result.warningList
+    // totalCount.value = data.result.total_count
+    // page.value = data.result.page
+    // totalPages.value = data.result.total_pages
+
+    // 计算分组后的总数并初始化分页信息（前端分页）
+    // groupedWarningList 是一个 computed，修改 warningList 后可以直接读取其值
+    totalCount.value = groupedWarningList.value.length
+    page.value = 1
+    totalPages.value = Math.ceil(totalCount.value / pageSize.value) || 0
   } catch (e) {
     console.error('获取预警失败', e)
   }
@@ -250,6 +256,13 @@ const groupedWarningList = computed(() => {
     }
   })
   return Object.values(map)
+})
+
+// 新增按分组分页的 computed
+const paginatedGroups = computed(() => {
+  const groups = groupedWarningList.value || []
+  const start = (page.value - 1) * pageSize.value
+  return groups.slice(start, start + pageSize.value)
 })
 
 // 展开时从当前 warningList 中取出该组的明细（不影响搜索）
@@ -295,12 +308,12 @@ const resetSearch = () => {
 }
 const handlePageChange = (cur) => {
   page.value = cur
-  getWarningData()
+  // getWarningData()
 }
 const handleSizeChange = (size) => {
   pageSize.value = size
   page.value = 1
-  getWarningData()
+  // getWarningData()
 }
 const levelMap = { 1: { label: '1级' }, 2: { label: '2级' } }
 const statusMap = {
@@ -429,7 +442,7 @@ watch([combinerId, level, startDate, endDate], () => getWarningData())
 
     <!-- 表格 -->
      <el-table
-      :data="groupedWarningList"
+      :data="paginatedGroups"
       style="margin-top: 10px"
       row-key="warningDescription"
       height="60vh"
