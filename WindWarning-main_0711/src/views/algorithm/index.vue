@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getAlgorithm,getModuleList} from '@/api/algorithm'
+import addAlgorithm from '@/components/algorithm/addAlgorithm.vue'
 
 const algorithmList = ref([])
+const dialogVisible = ref(false)
 
 const getAlgorithmData = async () => {
   try {
@@ -39,7 +41,7 @@ onMounted(getAlgorithmData)
   <div class="container">
     <!-- <el-form label-width="120px" style="margin-top: 10px; margin-bottom: 10px; margin-left: 10px">
       <el-row :gutter="10">
-        <el-button type="primary" @click="dialogVisible = true">新增测点</el-button>
+        <el-button type="primary" @click="dialogVisible = true">新增算法</el-button>
       </el-row>
     </el-form> -->
     <h2 style="text-align: center;">规则生成</h2>
@@ -62,10 +64,10 @@ onMounted(getAlgorithmData)
       </el-table-column> -->
     </el-table>
 
-    <!-- 新建模型弹窗 -->
-    <!-- <el-dialog title="新增测点" v-model="dialogVisible" width="80%">
-      <addRealPoint :dialog-visible="dialogVisible" @close-dialog="dialogVisible = false" />
-    </el-dialog> -->
+    <!--     新增算法弹窗 -->
+     <el-dialog title="新增算法" v-model="dialogVisible" width="80%">
+      <addAlgorithm :dialog-visible="dialogVisible" @close-dialog="dialogVisible = false" />
+    </el-dialog>
   </div>
 </template>
 
@@ -136,5 +138,29 @@ onMounted(getAlgorithmData)
     color: #c2dcf5 !important;
   }
 }
+/* 弹窗样式 */
+:deep(.el-dialog__wrapper) {
+  background-color: rgba(20, 63, 92, var(--overlay-opacity, 0.8)) !important;
+}
 
+:deep(.el-dialog) {
+  background-color: rgba(20, 63, 92, var(--dialog-opacity, 0.8)) !important;
+  box-shadow: none !important;
+  color: white !important;
+}
+
+/* 针对标题 */
+:deep(.el-dialog__header .el-dialog__title) {
+  color: white !important;
+}
+
+/* 针对内容 */
+:deep(.el-dialog__body) {
+  color: white !important;
+}
+
+/* 如果有关闭按钮 */
+:deep(.el-dialog__headerbtn .el-dialog__close) {
+  color: white !important;
+}
 </style>

@@ -9,3 +9,12 @@ export function getAlgorithm(params) {
 export function getModuleList(params) {
     return axios.get('/ews/module/list', { params })
 }
+
+//算法新增
+export function addAlgorithm(data) {
+    return axios.post('/ews/algorithms/add', data, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}

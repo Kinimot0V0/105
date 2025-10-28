@@ -5,6 +5,7 @@ import { getTurbineList } from '@/api/report'
 import { getWarning } from '@/api/warning'
 import { getFarmInfo } from '@/api/warningDetail'
 import warningDetail from '@/components/warningList/warningDetail.vue'
+import newWarningDetail from '@/components/warningList/newWarningDetail.vue'
 
 // 公司相关变量
 import { getCompany } from '@/api/company'
@@ -40,6 +41,9 @@ const levelList = ref([
 //时间相关
 const startDate = ref(null)
 const endDate = ref(null)
+
+// 搜索相关变量
+const searchDescription = ref('')
 
 // 格式化日期为字符串
 const formatDate = (date) => {
@@ -133,8 +137,12 @@ const getWarningData = async () => {
       page_size: pageSize.value,
       start_date: startDate.value,
       end_date: endDate.value,
-      company_id: companyId.value
+      company_id: companyId.value,
+      warnFlag: 0
     }
+        // 添加描述搜索参数
+    if (searchDescription.value) params.warnDescription = searchDescription.value
+
     if (windFarmId.value) params.windfarm_id = windFarmId.value
     if (turbineId.value) params.turbine_id = turbineId.value
     if (level.value !== '') params.warning_level = level.value
@@ -168,6 +176,18 @@ const getWarningData = async () => {
     console.error('获取预警数据失败:', error)
   }
 }
+// 添加搜索方法
+const handleSearch = () => {
+  page.value = 1 // 重置到第一页
+  getWarningData()
+}
+
+// 添加重置搜索方法
+const resetSearch = () => {
+  searchDescription.value = ''
+  page.value = 1
+  getWarningData()
+}
 
 // 初始化时获取公司、风场和风机列表
 onMounted(async () => {
@@ -175,7 +195,7 @@ onMounted(async () => {
   await getCompanyList()
   await getWindFarm()
   await getWarningData()
-  windFarmId.value = ''
+  windFarmId.value = windFarmList.value[1].windFarmId
   turbineId.value = ''
   level.value = ''
 })
@@ -327,6 +347,30 @@ const look = (
           ></el-option>
         </el-select>
       </div>
+
+                  <!-- 添加搜索区域 -->
+      <div class="search-section">
+        <el-input
+            v-model="searchDescription"
+            placeholder="请输入关键字搜索"
+            clearable          style="width: 200px; margin-right: 10px"
+            @keyup.enter="handleSearch"
+        />
+        <el-button
+            @click="handleSearch"
+            class="operation"
+            style="background-color: #164b6d; border-color: #164b6d;"
+        >
+          搜索
+        </el-button>
+        <el-button
+            @click="resetSearch"
+            class="operation"
+            style="background-color: #164b6d; border-color: #164b6d;"
+        >
+          重置
+        </el-button>
+      </div>
     </div>
 
     <el-table :data="warningList">
@@ -406,7 +450,7 @@ const look = (
       </el-pagination>
     </div>
     <el-dialog title="预警详情" v-model="lookDialogVisible" width="90%">
-      <warningDetail
+      <newWarningDetail
         v-if="lookDialogVisible"
         :turbineId="detailTurbineId"
         :warningDescription="detailWarningDescription"
@@ -422,6 +466,10 @@ const look = (
 </template>
 
 <style scoped>
+.search-section {
+  display: flex;
+  align-items: center;
+}
 .container {
   padding: 10px;
   margin-top: 10px;

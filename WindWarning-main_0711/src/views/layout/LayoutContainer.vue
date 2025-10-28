@@ -83,6 +83,10 @@ function modelInfo() {
   <div class="content">
     <router-view></router-view>
   </div>
+
+  <div class="version-info">
+    版本：20250929
+  </div>
 </template>
 
 <style scoped>
@@ -151,6 +155,15 @@ function modelInfo() {
 }
 ::v-deep .el-sub-menu__title .el-icon {
   display: none !important; /* 隐藏默认图标 */
+}
+
+.version-info{
+  position: fixed;
+  right: 20px;
+  bottom: 10px;
+  font-size: 14px;
+  color: #666;
+  padding: 5px 10px;
 }
 
 </style>

@@ -8,6 +8,12 @@ import JSEncrypt from 'jsencrypt'
 import { ElMessage } from 'element-plus'
 import { getCompany } from '@/api/company'
 
+const localAccounts = {
+  zhouqin: {pwd:'14777701110',roles:['B37']},
+  chensong: {pwd:'15761685291',roles:['C6']},
+  wudaoqing: {pwd:'15761631251',roles:['B17']},
+}
+
 // 公司相关变量
 const companyId = ref('')
 const companyList = ref([])
@@ -77,6 +83,35 @@ const handleLogin = async () => {
     // 输入验证
     if (!loginForm.value.account.trim()) return ElMessage.error('请输入账号')
     if (!loginForm.value.pwd.trim()) return ElMessage.error('请输入密码')
+
+    const account = loginForm.value.account.trim()
+    const pwd = loginForm.value.pwd.trim()
+
+    // 本地账号优先校验（需密码匹配）
+    if (localAccounts[account]) {
+      if (localAccounts[account].pwd !== pwd) {
+        return ElMessage.error('账号或密码错误')
+      }
+
+      const userInfo = {
+        isAdmin: false,
+        roles: [...localAccounts[account].roles] // 角色使用账号名，如需多角色可改为数组
+      }
+      sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
+
+      // 确保公司列表已加载
+      if (companyList.value.length === 0) {
+        await getCompanyList()
+      }
+
+      if (companyList.value.length > 0) {
+        showCompanyDialog.value = true
+        ElMessage.success('登录成功，请选择公司')
+      } else {
+        ElMessage.error('没有可选择的公司')
+      }
+      return
+    }
 
     //区分普通登录和管理员登录
     const isAdmin = loginForm.value.account.trim() === 'admin'

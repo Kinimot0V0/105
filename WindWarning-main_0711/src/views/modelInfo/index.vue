@@ -368,6 +368,32 @@ const handleDelete = async (modelId) => {
     }
   }
 }
+
+// 批量删除方法
+const deleteMore = async () => {
+  try {
+    // 使用 ElMessageBox 显示确认弹窗
+    await ElMessageBox.confirm('确定要批量删除这些模型吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+
+    // 如果用户点击确定，则执行删除操作
+    const deleteData = selectedModelIds.value
+    // console.log('删除数据', deleteData)
+
+    // 调用 Delete 接口
+    const responseDelete = await Delete(deleteData)
+    // console.log('Delete接口返回的数据:', responseDelete.data)
+    getModelData()
+  } catch (error) {
+    // 如果用户点击取消，或者接口调用出错，都会进入这里
+    if (error !== 'cancel') {
+      console.error('删除接口调用错误:', error)
+    }
+  }
+}
 </script>
 
 <template>
@@ -450,6 +476,7 @@ const handleDelete = async (modelId) => {
         <el-button type="success" :disabled="isDisabled" @click="editDialogVisible = true">批量编辑</el-button>
         <el-button type="danger" :disabled="isDisabled" @click="startMore">批量开启</el-button>
         <el-button type="primary" @click="oneStart">一键开启</el-button>
+        <el-button type="danger" :disabled="isDisabled" @click="deleteMore">批量删除</el-button>
       </div>
     </div>
 

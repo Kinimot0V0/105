@@ -6,6 +6,7 @@ import { ElMessage } from 'element-plus'
 import { getWarning } from '@/api/warning'
 import { getFarmInfo } from '@/api/warningDetail'
 import warningDetail from '@/components/warningList/warningDetail.vue'
+import newWarningDetail from '@/components/warningList/newWarningDetail.vue'
 
 // 公司相关变量
 import { getCompany } from '@/api/company'
@@ -47,6 +48,9 @@ const totalCount = ref(0)
 const page = ref(1)
 const pageSize = ref(10)
 const totalPages = ref(0)
+
+// 搜索相关变量
+const searchDescription = ref('')
 
 // 格式化日期为字符串
 const formatDate = (date) => {
@@ -157,8 +161,12 @@ const getWarningData = async () => {
       page_size: pageSize.value,
       start_date: startDate.value,
       end_date: endDate.value,
-      company_id: companyId.value
+      company_id: companyId.value,
+      sort_direction: 'asc'
     }
+        // 添加描述搜索参数
+    if (searchDescription.value) params.warnDescription = searchDescription.value
+
     if (windFarmId.value) params.windfarm_id = windFarmId.value
     if (turbineId.value) params.turbine_id = turbineId.value
     if (level.value !== '') params.warning_level = level.value
@@ -194,6 +202,18 @@ const getWarningData = async () => {
     console.error('获取预警数据失败:', error)
   }
 }
+// 添加搜索方法
+const handleSearch = () => {
+  page.value = 1 // 重置到第一页
+  getWarningData()
+}
+
+// 添加重置搜索方法
+const resetSearch = () => {
+  searchDescription.value = ''
+  page.value = 1
+  getWarningData()
+}
 
 // 初始化时获取公司、风场和风机列表
 onMounted(async () => {
@@ -201,7 +221,7 @@ onMounted(async () => {
   await getCompanyList()
   await getWindFarm()
   await getWarningData()
-  windFarmId.value = ''
+  windFarmId.value = windFarmList.value[1].windFarmId
   turbineId.value = ''
   level.value = ''
 })
@@ -266,6 +286,8 @@ const detailEndTime = ref(null)
 const detailWarningStatus = ref(null)
 const detailTurbineName = ref(null)
 const detailWarningId = ref(null)
+const detailStandCode = ref(null)
+const detailNewWarningLevel = ref(null)
 const look = (
   turbineId,
   warningDescription,
@@ -274,7 +296,9 @@ const look = (
   endTime,
   warningStatus,
   turbineName,
-  warningId
+  warningId,
+  standCode,
+  newWarningLevel
 ) => {
   detailTurbineId.value = turbineId
   detailWarningDescription.value = warningDescription
@@ -284,6 +308,8 @@ const look = (
   detailWarningStatus.value = warningStatus
   detailTurbineName.value = turbineName
   detailWarningId.value = warningId
+  detailStandCode.value = standCode
+  detailNewWarningLevel.value = newWarningLevel
   lookDialogVisible.value = true
 }
 </script>
@@ -379,34 +405,63 @@ const look = (
         ></el-date-picker>
       </div>
     </div>
+                        <!-- 添加搜索区域 -->
+      <div class="search-section">
+        <el-input
+            v-model="searchDescription"
+            placeholder="请输入关键字搜索"
+            clearable          style="width: 200px; margin-right: 10px"
+            @keyup.enter="handleSearch"
+        />
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d;"
+            @click="handleSearch"
+            class="operation"
+        >
+          搜索
+        </el-button>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d;"
+            @click="resetSearch"
+            class="operation"
+        >
+          重置
+        </el-button>
+      </div>
 
     <el-table :data="warningList">
-      <el-table-column label="序号" width="120px" align="center">
+      <el-table-column label="序号" width="60px" align="center">
         <template #default="scope">
           {{ scope.$index + 1 }}
         </template>
       </el-table-column>
 
-      <el-table-column label="开始时间" width="220px" align="center">
+      <el-table-column label="开始时间" width="150px" align="center">
         <template #default="scope">
           {{ scope.row.startTime.replace('T', ' ') }}
         </template>
       </el-table-column>
-      <el-table-column label="结束时间" width="220px" align="center">
+      <el-table-column label="结束时间" width="150px" align="center">
         <template #default="scope">
           {{ scope.row.endTime.replace('T', ' ') }}
         </template>
       </el-table-column>
-      <el-table-column prop="windFarmName" label="风场名称" width="250px" align="center"></el-table-column>
-      <el-table-column prop="turbineName" label="风机名称" width="300px" align="center"></el-table-column>
+      <el-table-column prop="windFarmName" label="风场名称"  align="center"></el-table-column>
+      <el-table-column prop="turbineName" label="风机名称"  align="center"></el-table-column>
       <el-table-column prop="warningDescription" label="预警信息" align="center"></el-table-column>
-      <el-table-column prop="warningLevel" label="等级" width="150px" align="center">
+      <el-table-column prop="standCode" label="故障编码" align="center"></el-table-column>
+      <el-table-column prop="standDes" label="所属系统" align="center"></el-table-column>
+      <el-table-column prop="newWarningLevel" label="管理分级" align="center"></el-table-column>
+      <el-table-column prop="consequence" label="可能影响后果" align="center"></el-table-column>
+      <el-table-column prop="warningLabel" label="缺陷分类" align="center"></el-table-column>
+      <el-table-column prop="priority" label="维修优先级" align="center"></el-table-column>
+      <!-- <el-table-column prop="warningLevel" label="等级" width="150px" align="center">
         <template #default="scope">
           <span>
             {{ levelMap[scope.row.warningLevel]?.label }}
           </span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column prop="warningStatus" label="状态" width="150px" align="center">
         <template #default="scope">
           <span
@@ -431,7 +486,9 @@ const look = (
                 scope.row.endTime,
                 scope.row.warningStatus,
                 scope.row.turbineName,
-                scope.row.warningId
+                scope.row.warningId,
+                scope.row.standCode,
+                scope.row.newWarningLevel
               )
             "
             >查看</el-link
@@ -456,8 +513,8 @@ const look = (
       >
       </el-pagination>
     </div>
-    <el-dialog title="预警详情" v-model="lookDialogVisible" width="90%">
-      <warningDetail
+    <el-dialog title="预警详情" v-model="lookDialogVisible" width="80%">
+      <newWarningDetail
         v-if="lookDialogVisible"
         :turbineId="detailTurbineId"
         :warningDescription="detailWarningDescription"
@@ -467,12 +524,20 @@ const look = (
         :endTime="detailEndTime"
         :turbineName="detailTurbineName"
         :warningId="detailWarningId"
+        :standCode="detailStandCode"
+        :newWarningLevel="detailNewWarningLevel"
       />
     </el-dialog>
   </div>
 </template>
 
 <style scoped>
+.search-section {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  padding-left: 25px;
+}
 .container {
   padding: 10px;
   margin-top: 10px;

@@ -254,6 +254,15 @@ const getPictures = async () => {
     switch (currentPicType.value) {
       case 1: // ===== 散点图 =====
         scatterData.value = result.map(item => {
+          //边界检查，当数据少于2组时画空图
+          if (!item.points || item.points.length < 2) {
+           return {
+             title: item.picName,
+             xName: '',
+             yName: '',
+             data: []
+            }
+          }
           const [xPoint, yPoint] = item.points
           const map = new Map()
           xPoint.pointValue.forEach(x =>
@@ -280,6 +289,73 @@ const getPictures = async () => {
           }
         })
         break
+
+        // case 1: // ===== 散点图（双指针优化） =====
+        // // 预先创建开始时间和结束时间的 Date 对象
+        // const startTimeObj = new Date(props.startTime);
+        // const endTimeObj = new Date(props.endTime);
+      
+        // scatterData.value = result.map(item => {
+        //   // 增加边界检查，确保 points 存在且至少包含两个数据点
+        //   if (!item.points || item.points.length < 2) {
+        //     return {
+        //       title: item.picName,
+        //       xName: '',
+        //       yName: '',
+        //       data: []
+        //     };
+        //   }
+      
+        //   const [xPoint, yPoint] = item.points;
+        //   const xValues = xPoint.pointValue;
+        //   const yValues = yPoint.pointValue;
+        //   let i = 0;
+        //   let j = 0;
+        //   const mergedData = [];
+      
+        //   // 使用双指针方法合并 x 和 y 轴的数据点
+        //   while (i < xValues.length && j < yValues.length) {
+        //     const xDatetime = xValues[i].datetime;
+        //     const yDatetime = yValues[j].datetime;
+      
+        //     if (xDatetime === yDatetime) {
+        //       mergedData.push({
+        //         x: Number(xValues[i].value.toFixed(2)),
+        //         y: Number(yValues[j].value.toFixed(2)),
+        //         datetime: xDatetime
+        //       });
+        //       i++;
+        //       j++;
+        //     } else if (xDatetime < yDatetime) {
+        //       i++;
+        //     } else {
+        //       j++;
+        //     }
+        //   }
+      
+        //   // 过滤掉没有 y 值的数据点，然后映射为图表所需格式
+        //   const filteredData = mergedData
+        //       .filter(d => d.y !== undefined) // 只保留同时有 x 和 y 值的数据点
+        //       .map(d => {
+        //         // 判断该数据点是否在告警时间范围内
+        //         const isAlarm = new Date(d.datetime) >= startTimeObj && new Date(d.datetime) <= endTimeObj;
+      
+        //         // 返回图表所需的数据格式
+        //         return {
+        //           value: [d.x, d.y],
+        //           itemStyle: { color: isAlarm ? 'red' : 'DodgerBlue' }
+        //         };
+        //       });
+      
+        //   // 返回当前图表的完整配置
+        //   return {
+        //     title: item.picName,              // 图表标题
+        //     xName: xPoint.pointDescription,   // x轴名称
+        //     yName: yPoint.pointDescription,   // y轴名称
+        //     data: filteredData                // 处理后的数据点
+        //   };
+        // });
+        // break;
 
       case 2: // ===== 趋势图（不含阈值）=====
         trendPicData.value = result.map(pic => ({
