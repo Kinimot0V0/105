@@ -3,8 +3,13 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { getPvFarmList, getDevice } from '@/api/overview'
 import { getWarning } from '@/api/warning'
 import warningDetail from '@/components/warningList/warningDetail.vue'
+import newWarningDetail from './newWarningDetail.vue'
 import { getFarmInfo } from '@/api/warningDetail'
 import { ElMessage } from 'element-plus'
+import { toRaw } from 'vue'
+
+const expandedData = ref({})        // 缓存展开的明细
+const expandedLoading = ref({})     // 可用于加载状态
 // 公司相关变量
 import { getCompany } from '@/api/company'
 // 公司相关变量
@@ -41,6 +46,8 @@ const levelList = ref([
   { levelId: 1, levelName: '1级' },
   { levelId: 2, levelName: '2级' }
 ])
+// 搜索相关变量
+const searchDescription = ref('')
 
 /* ========= 2. 时间 & 分页 ========= */
 const startDate = ref(null)
@@ -166,8 +173,11 @@ const getWarningData = async () => {
       page: page.value,
       pageSize: pageSize.value,
       startDate: startDate.value,
-      endDate: endDate.value
+      endDate: endDate.value,
+      sort_direction: 'asc'
     }
+            // 添加描述搜索参数
+    if (searchDescription.value) params.warnDescription = searchDescription.value
     if (pvFarmId.value) params.pvFarmId = pvFarmId.value
     if (inverterId.value) params.inverterId = inverterId.value
     if (combinerId.value) params.combinerId = combinerId.value
@@ -222,15 +232,67 @@ const getWarningData = async () => {
   }
 }
 
+// 按 warningDescription 对当前页的 warningList 做本地分组
+const groupedWarningList = computed(() => {
+  const map = {};
+  (warningList.value || []).forEach((item) => {
+    const key = item.warningDescription || '未描述'
+    if (!map[key]) {
+      // 把分组行主要字段取自该组第一个元素（可按需调整）
+      map[key] = {
+        warningDescription: key,
+        deviceName: item.deviceName || '',
+        pvFarmName: item.pvFarmName || '',
+        _samples: [item] // 用于统计或取示例
+      }
+    } else {
+      map[key]._samples.push(item)
+    }
+  })
+  return Object.values(map)
+})
+
+// 展开时从当前 warningList 中取出该组的明细（不影响搜索）
+const handleExpand = async (row) => {
+  const key = row.warningDescription
+  if (!expandedData.value[key]) {
+    try {
+      expandedLoading.value[key] = true
+      // 从当前页的 warningList 过滤出同 description 的项
+      const details = (warningList.value || []).filter((it) => it.warningDescription === key)
+      // 深拷贝以避免响应式引用问题
+      expandedData.value[key] = details.map((d) => ({ ...toRaw(d) }))
+    } catch (e) {
+      console.error('组展开失败', e)
+    } finally {
+      expandedLoading.value[key] = false
+    }
+  }
+}
+
+
 /* ========= 7. 生命周期 ========= */
 onMounted(async () => {
   initDefaultTimeRange()
   await getCompanyList()
   await getPvFarm()
   getWarningData()
+  pvFarmId.value = pvFarmList.value[0].id
 })
 
 /* ========= 8. 其它辅助 ========= */
+// 添加搜索方法
+const handleSearch = () => {
+  page.value = 1 // 重置到第一页
+  getWarningData()
+}
+
+// 添加重置搜索方法
+const resetSearch = () => {
+  searchDescription.value = ''
+  page.value = 1
+  getWarningData()
+}
 const handlePageChange = (cur) => {
   page.value = cur
   getWarningData()
@@ -285,6 +347,29 @@ watch([combinerId, level, startDate, endDate], () => getWarningData())
           :value="company.companyId"
         ></el-option>
       </el-select>
+                  <!-- 添加搜索区域 -->
+      <div class="search-section">
+        <el-input
+            v-model="searchDescription"
+            placeholder="请输入关键字搜索"
+            clearable          style="width: 200px; margin-right: 10px"
+            @keyup.enter="handleSearch"
+        />
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d;"
+            @click="handleSearch"
+            class="operation"
+        >
+          搜索
+        </el-button>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d;"
+            @click="resetSearch"
+            class="operation"
+        >
+          重置
+        </el-button>
+      </div>
     </div>
 
     <!-- 全部筛选控件，自动换行 -->
@@ -343,7 +428,66 @@ watch([combinerId, level, startDate, endDate], () => getWarningData())
     </div>
 
     <!-- 表格 -->
-    <el-table :data="warningList" style="margin-top: 10px">
+     <el-table
+      :data="groupedWarningList"
+      style="margin-top: 10px"
+      row-key="warningDescription"
+      height="60vh"
+      @expand-change="handleExpand"
+    >
+      <el-table-column type="expand">
+        <template #default="{ row }">
+          <el-table
+            :data="expandedData[row.warningDescription] || []"
+            height="320"
+            v-loading="expandedLoading[row.warningDescription]"
+            element-loading-text="数据加载中..."
+            :show-header="false"
+          >
+            <el-table-column label="开始时间" width="200" align="center">
+              <template #default="scope">{{ scope.row.startTime ? scope.row.startTime.replace('T', ' ') : '' }}</template>
+            </el-table-column>
+            <el-table-column label="结束时间" width="200" align="center">
+              <template #default="scope">{{ scope.row.endTime ? scope.row.endTime.replace('T', ' ') : '' }}</template>
+            </el-table-column>
+            <el-table-column prop="pvFarmName" label="场站名称" width="220" align="center" />
+            <el-table-column prop="deviceName" label="设备名称" width="250" align="center" />
+            <el-table-column prop="warningDescription" label="预警信息" align="center" />
+            <el-table-column prop="warningLevel" label="等级" width="120" align="center">
+              <template #default="scope">{{ levelMap[scope.row.warningLevel]?.label }}</template>
+            </el-table-column>
+            <el-table-column prop="warningStatus" label="状态" width="120" align="center">
+              <template #default="scope">
+                <span :style="{ color: statusMap[scope.row.warningStatus]?.color }">
+                  {{ statusMap[scope.row.warningStatus]?.label }}
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column label="详情" width="120" align="center">
+              <template #default="scope">
+                <el-link type="primary" @click="look(scope.row)">查看</el-link>
+              </template>
+            </el-table-column>
+          </el-table>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="序号" width="80" align="center">
+        <template #default="scope">{{ scope.$index + 1 }}</template>
+      </el-table-column>
+      <el-table-column label="开始时间" width="200" align="center">
+        <template #default="scope">
+          {{ (scope.row._samples && scope.row._samples[0]?.startTime) ? scope.row._samples[0].startTime.replace('T',' ') : '' }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="pvFarmName" label="场站名称" width="220" align="center">
+        <template #default="scope">{{ scope.row.pvFarmName }}</template>
+      </el-table-column>
+      <el-table-column prop="deviceName" label="设备名称" width="250" align="center" />
+      <el-table-column prop="warningDescription" label="预警信息" align="center" />
+    </el-table>
+
+    <!-- <el-table :data="warningList" style="margin-top: 10px">
       <el-table-column label="序号" width="80" align="center">
         <template #default="scope">{{ scope.$index + 1 }}</template>
       </el-table-column>
@@ -371,7 +515,7 @@ watch([combinerId, level, startDate, endDate], () => getWarningData())
           <el-link type="primary" @click="look(scope.row)">查看</el-link>
         </template>
       </el-table-column>
-    </el-table>
+    </el-table> -->
 
     <!-- 分页 -->
     <div class="pager-line">
@@ -390,12 +534,16 @@ watch([combinerId, level, startDate, endDate], () => getWarningData())
 
     <!-- 详情弹窗 -->
     <el-dialog title="预警详情" v-model="lookDialogVisible" width="90%">
-      <warningDetail v-if="lookDialogVisible" v-bind="detail" />
+      <newWarningDetail v-if="lookDialogVisible" v-bind="detail" />
     </el-dialog>
   </div>
 </template>
 
 <style scoped>
+.search-section {
+  display: flex;
+  align-items: center;
+}
 .container {
   padding: 10px;
   margin-top: 10px;

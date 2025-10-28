@@ -209,6 +209,11 @@ const handleTest = (modelId) => {
   currentModelId.value = modelId
   testDialogVisible.value = true
 }
+//查看阈值
+const handleLook = (modelId) => {
+  currentModelId.value = modelId       // 保存当前模型 id
+  thrDialogVisible.value = true
+}
 // 判断按钮是否禁用
 const isDisabled = computed(() => {
   const selected = selectedModelIds.value
@@ -352,6 +357,32 @@ const handleDelete = async (modelId) => {
     }
   }
 }
+
+// 批量删除方法
+const deleteMore = async () => {
+  try {
+    // 使用 ElMessageBox 显示确认弹窗
+    await ElMessageBox.confirm('确定要批量删除这些模型吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+
+    // 如果用户点击确定，则执行删除操作
+    const deleteData = selectedModelIds.value
+    // console.log('删除数据', deleteData)
+
+    // 调用 Delete 接口
+    const responseDelete = await Delete(deleteData)
+    // console.log('Delete接口返回的数据:', responseDelete.data)
+    getModelData()
+  } catch (error) {
+    // 如果用户点击取消，或者接口调用出错，都会进入这里
+    if (error !== 'cancel') {
+      console.error('删除接口调用错误:', error)
+    }
+  }
+}
 </script>
 
 <template>
@@ -429,6 +460,7 @@ const handleDelete = async (modelId) => {
         <el-button type="success" :disabled="isDisabled" @click="editDialogVisible = true">批量编辑</el-button>
         <el-button type="danger" :disabled="isDisabled" @click="startMore">批量开启</el-button>
         <el-button type="primary" @click="oneStart">一键开启</el-button>
+        <el-button type="danger" :disabled="isDisabled" @click="deleteMore">批量删除</el-button>
       </div>
     </div>
 
@@ -469,8 +501,8 @@ const handleDelete = async (modelId) => {
           <el-link type="success" @click="handleTest(scope.row.modelId)">测试</el-link>
           &nbsp;|&nbsp;
           <el-link type="danger" @click="handleDelete(scope.row.modelId)">删除</el-link>
-          <!-- &nbsp;|&nbsp;
-          <el-link type="primary" @click="handleLook(scope.row.modelId)">查看阈值</el-link> -->
+          &nbsp;|&nbsp;
+          <el-link type="primary" @click="handleLook(scope.row.modelId)">查看阈值</el-link>
         </template>
       </el-table-column>
     </el-table>

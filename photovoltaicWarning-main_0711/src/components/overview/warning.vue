@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import warningDetail from '@/components/warningList/warningDetail.vue'
+import newWarningDetail from '@/components/warningList/newWarningDetail.vue'
 const props = defineProps({
   warningList: {
     type: Array,
@@ -160,7 +161,7 @@ onUnmounted(() => {
       />
     </div>
     <el-dialog title="预警详情" v-model="lookDialogVisible" width="90%">
-      <warningDetail v-if="lookDialogVisible" v-bind="detail" />
+      <newWarningDetail v-if="lookDialogVisible" v-bind="detail" />
     </el-dialog>
   </div>
 </template>

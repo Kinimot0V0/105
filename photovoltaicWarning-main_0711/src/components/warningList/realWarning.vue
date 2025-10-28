@@ -3,6 +3,7 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { getPvFarmList, getDevice } from '@/api/overview'
 import { getWarning } from '@/api/warning'
 import warningDetail from '@/components/warningList/warningDetail.vue'
+import newWarningDetail from '@/components/warningList/newWarningDetail.vue'
 import { getFarmInfo } from '@/api/warningDetail'
 // 公司相关变量
 import { getCompany } from '@/api/company'
@@ -40,6 +41,8 @@ const levelList = ref([
   { levelId: 1, levelName: '1级' },
   { levelId: 2, levelName: '2级' }
 ])
+// 搜索相关变量
+const searchDescription = ref('')
 
 /* ========= 2. 时间 & 分页 ========= */
 const totalCount = ref(0)
@@ -153,6 +156,8 @@ const getWarningData = async () => {
       startDate: startDate.value,
       endDate: endDate.value
     }
+                // 添加描述搜索参数
+    if (searchDescription.value) params.warnDescription = searchDescription.value
     if (pvFarmId.value) params.pvFarmId = pvFarmId.value
     if (inverterId.value) params.inverterId = inverterId.value
     if (combinerId.value) params.combinerId = combinerId.value
@@ -213,9 +218,22 @@ onMounted(async () => {
   await getCompanyList()
   await getPvFarm()
   getWarningData()
+  pvFarmId.value = pvFarmList.value[0].id
 })
 
 /* ========= 8. 其它辅助 ========= */
+// 添加搜索方法
+const handleSearch = () => {
+  page.value = 1 // 重置到第一页
+  getWarningData()
+}
+
+// 添加重置搜索方法
+const resetSearch = () => {
+  searchDescription.value = ''
+  page.value = 1
+  getWarningData()
+}
 const handlePageChange = (cur) => {
   page.value = cur
   getWarningData()
@@ -270,6 +288,29 @@ watch([combinerId, level], () => getWarningData())
           :value="company.companyId"
         ></el-option>
       </el-select>
+                        <!-- 添加搜索区域 -->
+      <div class="search-section">
+        <el-input
+            v-model="searchDescription"
+            placeholder="请输入关键字搜索"
+            clearable          style="width: 200px; margin-right: 10px"
+            @keyup.enter="handleSearch"
+        />
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d;"
+            @click="handleSearch"
+            class="operation"
+        >
+          搜索
+        </el-button>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d;"
+            @click="resetSearch"
+            class="operation"
+        >
+          重置
+        </el-button>
+      </div>
     </div>
 
     <!-- 全部筛选控件，自动换行 -->
@@ -353,12 +394,16 @@ watch([combinerId, level], () => getWarningData())
 
     <!-- 详情弹窗 -->
     <el-dialog title="预警详情" v-model="lookDialogVisible" width="90%">
-      <warningDetail v-if="lookDialogVisible" v-bind="detail" />
+      <newWarningDetail v-if="lookDialogVisible" v-bind="detail" />
     </el-dialog>
   </div>
 </template>
 
 <style scoped>
+.search-section {
+  display: flex;
+  align-items: center;
+}
 .container {
   padding: 10px;
   margin-top: 10px;

@@ -54,8 +54,8 @@ function modelInfo() {
     <el-menu-item index="/intelligentEarlyWarning" @click="iew">智能预警</el-menu-item>
     <!-- <el-menu-item index="/modelInfo" @click="modelInfo" v-if="isAdmin">预警生成管理</el-menu-item>
     <el-sub-menu index="others" v-if="isAdmin"> -->
-    <el-menu-item index="/modelInfo" @click="modelInfo" >预警生成管理</el-menu-item>
-    <el-sub-menu index="others" >
+    <el-menu-item index="/modelInfo" @click="modelInfo" v-if="isAdmin">预警生成管理</el-menu-item>
+    <el-sub-menu index="others" v-if="isAdmin">
       <template #title>其他功能</template>
         <el-menu-item index="/measurePoint" @click="measurePoint">测点管理</el-menu-item>
         <el-menu-item index="/standardMeasurePoint" @click="standardMeasurePoint">标准测点管理</el-menu-item>
@@ -85,9 +85,21 @@ function modelInfo() {
   <div class="content">
     <router-view></router-view>
   </div>
+
+  <div class="version-info">
+    版本：20250929
+  </div>
 </template>
 
 <style scoped>
+.version-info{
+  position: fixed;
+  right: 20px;
+  bottom: 10px;
+  font-size: 14px;
+  color: #666;
+  padding: 5px 10px;
+}
 .content {
   flex-grow: 1;
   overflow: auto;

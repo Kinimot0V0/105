@@ -7,6 +7,7 @@ import pendingReport from '@/components/pendingWarning/pendingReport.vue'
 import level from '@/components/pendingWarning/level.vue'
 import confirmclose from '@/components/pendingWarning/confirmclose.vue'
 import warningDetail from '@/components/warningList/warningDetail.vue'
+import newWarningDetail from '@/components/warningList/newWarningDetail.vue'
 import { getWarnInfoList, getWarnInfoListByDesc } from '@/api/pendingWarning'
 
 ///权限相关///
@@ -408,7 +409,7 @@ const look = (row) => {
       />
     </el-dialog>
     <el-dialog title="预警详情" v-model="lookDialogVisible" width="90%">
-      <warningDetail v-if="lookDialogVisible" v-bind="detail" />
+      <newWarningDetail v-if="lookDialogVisible" v-bind="detail" />
     </el-dialog>
   </div>
 </template>
