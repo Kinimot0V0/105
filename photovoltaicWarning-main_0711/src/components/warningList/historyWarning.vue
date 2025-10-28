@@ -171,7 +171,8 @@ const getWarningData = async () => {
     const params = {
       companyId: companyId.value,
       page: page.value,
-      pageSize: pageSize.value,
+      //pageSize: pageSize.value,
+      pageSize: 99999,
       startDate: startDate.value,
       endDate: endDate.value,
       sort_direction: 'asc'
