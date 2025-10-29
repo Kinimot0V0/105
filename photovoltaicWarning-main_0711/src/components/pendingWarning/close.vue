@@ -105,7 +105,11 @@ const levelMap = ref({
         </template>
       </el-table-column>
       <el-table-column prop="deviceName" label="设备名称" width="230px" align="center" />
-      <el-table-column prop="warningDescription" label="预警信息" align="center" />
+      <el-table-column  label="预警信息" align="center">
+        <template #default="scope">
+          {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}
+        </template>
+      </el-table-column>
       <el-table-column prop="warningLevel" label="等级" width="100px" align="center">
         <template #default="scope">
           <span :style="{ color: levelMap[scope.row.warningLevel]?.color}">

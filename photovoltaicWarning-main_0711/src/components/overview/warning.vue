@@ -123,7 +123,11 @@ onUnmounted(() => {
       <el-table-column label="设备名称" align="center">
         <template #default="scope"> {{ scope.row.pvFarmName }}-{{ scope.row.deviceName }} </template>
       </el-table-column>
-      <el-table-column prop="warningDescription" label="预警信息" align="center"></el-table-column>
+      <el-table-column  label="预警信息" align="center">
+        <template #default="scope">
+          {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}
+        </template>
+      </el-table-column>
       <el-table-column prop="warningLevel" label="等级" align="center" width="60px">
         <template #default="scope">
           <span>
