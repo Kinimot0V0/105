@@ -39,11 +39,11 @@ onMounted(getAlgorithmData)
 
 <template>
   <div class="container">
-    <!-- <el-form label-width="120px" style="margin-top: 10px; margin-bottom: 10px; margin-left: 10px">
+    <el-form label-width="120px" style="margin-top: 10px; margin-bottom: 10px; margin-left: 10px">
       <el-row :gutter="10">
         <el-button type="primary" @click="dialogVisible = true">新增算法</el-button>
       </el-row>
-    </el-form> -->
+    </el-form>
     <h2 style="text-align: center;">规则生成</h2>
 
     <el-table :data="algorithmList" border  :max-height="680">
