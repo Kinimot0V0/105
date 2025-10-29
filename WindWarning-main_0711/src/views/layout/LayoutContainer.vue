@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
+import { computed } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -13,6 +14,25 @@ const isAdmin = userInfo?.isAdmin
 // 从 localStorage 获取用户信息
 // const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
 // const userRole = userInfo?.role || 'user'
+
+// 计算当前应该高亮的菜单 key，智能预警及其子页面都映射到 /intelligentEarlyWarning
+const activeMenu = computed(() => {
+  const p = route.path || ''
+  const intelligentPaths = [
+    '/intelligentEarlyWarning',
+    '/overview',
+    '/todo',
+    '/realWarning',
+    '/historyWarning',
+    '/notice'
+  ]
+  // 如果当前路径属于智能预警或其子页面，返回 /intelligentEarlyWarning
+  if (intelligentPaths.some(prefix => p.startsWith(prefix))) {
+    return '/intelligentEarlyWarning'
+  }
+  // 其它情况使用当前路径
+  return p
+})
 
 // 导航函数
 function iew() {
@@ -44,7 +64,7 @@ function modelInfo() {
     background-color="#042c54"
     text-color="#fff"
     active-text-color="#fff"
-    :default-active="route.path"
+    :default-active="activeMenu"
   >
     <!-- 标题部分 -->
     <h2 class="title">
