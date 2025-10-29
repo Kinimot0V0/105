@@ -135,7 +135,11 @@ onUnmounted(() => {
         </template>
       </el-table-column>
       <el-table-column prop="farmTurbineName" label="风机名称" align="center"></el-table-column>
-      <el-table-column prop="warningDescription" label="预警信息" align="center"></el-table-column>
+      <el-table-column  label="预警信息" align="center">
+        <template #default="scope">
+          {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}
+        </template>
+      </el-table-column>
       <el-table-column prop="warningLevel" label="等级" align="center" width="60px">
         <template #default="scope">
           <span>

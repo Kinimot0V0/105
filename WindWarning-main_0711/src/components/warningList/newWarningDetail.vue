@@ -724,14 +724,14 @@ onMounted(() => {
           <!-- 顶部基础信息（竖向排列） -->
           <div class="info-grid">
             <el-descriptions :column="2" border >
-              <el-descriptions-item label="预警信息">{{ props.warningDescription }}</el-descriptions-item>
+              <el-descriptions-item label="预警信息">{{ props.warningDescription.replace(/[\[\]']+/g, '')}}</el-descriptions-item>
               <el-descriptions-item label="预警设备">{{ windFarmName }}-{{ props.turbineName }}</el-descriptions-item>
               <el-descriptions-item label="预警状态"><el-tag type="danger">{{ statusMap[props.warningStatus]?.label}}</el-tag></el-descriptions-item>
-              <el-descriptions-item label="预警管理等级">{{ props.newWarningLevel }}</el-descriptions-item>
-              <el-descriptions-item label="预警编码标准分类">{{ props.standCode }}</el-descriptions-item>
+              <el-descriptions-item label="管理分级">{{ props.newWarningLevel }}</el-descriptions-item>
+              <el-descriptions-item label="故障编码">{{ props.standCode }}</el-descriptions-item>
               <el-descriptions-item label="开始时间">{{ props.startTime.replace('T', ' ') }}</el-descriptions-item>
               <el-descriptions-item label="结束时间">{{ props.endTime.replace('T', ' ') }}</el-descriptions-item>
-              <el-descriptions-item label="关键测点">‘液压系统压力’</el-descriptions-item>
+              <el-descriptions-item label="关键测点">液压系统压力</el-descriptions-item>
               <el-descriptions-item label="预警原因">液压系统频繁低压</el-descriptions-item>
             </el-descriptions>
             <!-- <div class="info-row">

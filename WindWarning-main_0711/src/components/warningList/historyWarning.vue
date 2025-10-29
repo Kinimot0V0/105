@@ -448,7 +448,11 @@ const look = (
       </el-table-column>
       <el-table-column prop="windFarmName" label="风场名称"  align="center"></el-table-column>
       <el-table-column prop="turbineName" label="风机名称"  align="center"></el-table-column>
-      <el-table-column prop="warningDescription" label="预警信息" align="center"></el-table-column>
+      <el-table-column  label="预警信息" align="center">
+        <template #default="scope">
+          {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}
+        </template>
+      </el-table-column>
       <el-table-column prop="standCode" label="故障编码" align="center"></el-table-column>
       <el-table-column prop="standDes" label="所属系统" align="center"></el-table-column>
       <el-table-column prop="newWarningLevel" label="管理分级" align="center"></el-table-column>

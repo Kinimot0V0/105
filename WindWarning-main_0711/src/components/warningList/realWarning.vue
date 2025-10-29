@@ -392,7 +392,11 @@ const look = (
       </el-table-column>
       <el-table-column prop="windFarmName" label="风场名称" width="250px" align="center"></el-table-column>
       <el-table-column prop="turbineName" label="风机名称" width="300px" align="center"></el-table-column>
-      <el-table-column prop="warningDescription" label="预警信息" align="center"></el-table-column>
+      <el-table-column  label="预警信息" align="center">
+        <template #default="scope">
+          {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}
+        </template>
+      </el-table-column>
       <el-table-column prop="warningLevel" label="等级" width="150px" align="center">
         <template #default="scope">
           <span>
