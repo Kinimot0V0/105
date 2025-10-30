@@ -582,11 +582,11 @@ onMounted(() => {
               <el-descriptions-item label="预警信息">{{ props.warningDescription.replace(/[\[\]']+/g, '')}}</el-descriptions-item>
               <el-descriptions-item label="预警设备">{{ props.deviceName }}</el-descriptions-item>
               <el-descriptions-item label="预警等级">{{ levelMap[props.warningLevel]?.label}}</el-descriptions-item>
-              <el-descriptions-item label="预警状态"><el-tag type="danger">{{ statusMap[props.warningStatus]?.label}}</el-tag></el-descriptions-item>
+              <el-descriptions-item label="预警状态"><span :style="{color: statusMap[props.warningStatus]?.color || 'black'}">{{ statusMap[props.warningStatus]?.label || '未处理' }}</span></el-descriptions-item>
               <!-- <el-descriptions-item label="管理等级">二类缺陷（4级）</el-descriptions-item> -->
               <!-- <el-descriptions-item label="故障编码">MDY05(电气传动链-变流器控制及附属系统-电网)</el-descriptions-item> -->
-              <el-descriptions-item label="开始时间">{{ props.startTime.replace('T', ' ') }}</el-descriptions-item>
-              <el-descriptions-item label="结束时间">{{ props.endTime.replace('T', ' ') }}</el-descriptions-item>
+              <el-descriptions-item label="开始时间——结束时间">{{ props.startTime.replace('T', ' ') }}——{{ props.endTime.replace('T', ' ') }}</el-descriptions-item>
+              <!-- <el-descriptions-item label="结束时间">{{ props.endTime.replace('T', ' ') }}</el-descriptions-item> -->
               <!-- <el-descriptions-item label="关键测点">风速、有功功率</el-descriptions-item> -->
               <!-- <el-descriptions-item label="预警原因">风速-功率数据点偏离正常区间范围，SCADA控制导致的降容</el-descriptions-item> -->
             </el-descriptions>

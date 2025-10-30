@@ -365,7 +365,7 @@ watch([combinerId, level, startDate, endDate], () => getWarningData())
       <div class="search-section">
         <el-input
             v-model="searchDescription"
-            placeholder="请输入关键字搜索"
+            placeholder="请输入预警信息关键字搜索"
             clearable          style="width: 200px; margin-right: 10px"
             @keyup.enter="handleSearch"
         />
