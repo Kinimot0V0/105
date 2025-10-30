@@ -35,24 +35,54 @@ const handlePageChange = (newPage) => {
 }
 
 //预警详情界面
-const detailTurbineId=ref(null)
-const detailWarningDescription=ref(null)
-const detailWarningLevel=ref(null)
-const detailStartTime=ref(null)
-const detailEndTime=ref(null)
-const detailWarningStatus=ref(null)
-const detailTurbineName=ref(null)
-const detailWarningId=ref(null)
-const look = (turbineId,warningDescription,warningLevel,startTime,endTime,warningStatus,turbineName,warningId) =>{
-  detailTurbineId.value=turbineId
-  detailWarningDescription.value=warningDescription
-  detailWarningLevel.value=warningLevel
-  detailStartTime.value=startTime
-  detailEndTime.value=endTime
-  detailWarningStatus.value=warningStatus
-  detailTurbineName.value=turbineName
-  detailWarningId.value=warningId
-  lookDialogVisible.value=true
+const detailTurbineId = ref(null)
+const detailWarningDescription = ref(null)
+const detailWarningLevel = ref(null)
+const detailStartTime = ref(null)
+const detailEndTime = ref(null)
+const detailWarningStatus = ref(null)
+const detailTurbineName = ref(null)
+const detailWarningId = ref(null)
+const detailStandCode = ref(null)
+const detailNewWarningLevel = ref(null)
+const detailStandDes = ref(null)
+const detailConsequence = ref(null)
+const detailWarningLabel = ref(null)
+const detailPriority = ref(null)
+const detailModelId = ref(null)
+const look = (
+  turbineId,
+  warningDescription,
+  warningLevel,
+  startTime,
+  endTime,
+  warningStatus,
+  turbineName,
+  warningId,
+  standCode,
+  newWarningLevel,
+  standDes,
+  consequence,
+  warningLabel,
+  priority,
+  modelId
+) => {
+  detailTurbineId.value = turbineId
+  detailWarningDescription.value = warningDescription
+  detailWarningLevel.value = warningLevel
+  detailStartTime.value = startTime
+  detailEndTime.value = endTime
+  detailWarningStatus.value = warningStatus
+  detailTurbineName.value = turbineName
+  detailWarningId.value = warningId
+  detailStandCode.value = standCode
+  detailNewWarningLevel.value = newWarningLevel
+  detailStandDes.value = standDes
+  detailConsequence.value = consequence
+  detailWarningLabel.value = warningLabel
+  detailPriority.value = priority
+  detailModelId.value = modelId
+  lookDialogVisible.value = true
 }
 
 // 等级映射
@@ -160,9 +190,23 @@ onUnmounted(() => {
       </el-table-column>
       <el-table-column prop="" label="详情" align="center" width="150px">
         <template #default="scope">
-          <el-link type="primary" @click="look(scope.row.turbineId,scope.row.warningDescription,
-          scope.row.warningLevel,scope.row.startTime,scope.row.endTime,scope.row.warningStatus,scope.row.turbineName,
-          scope.row.warningId)">查看</el-link>
+          <el-link type="primary" @click="look(
+            scope.row.turbineId,
+            scope.row.warningDescription,
+            scope.row.warningLevel,
+            scope.row.startTime,
+            scope.row.endTime,
+            scope.row.warningStatus,
+            scope.row.turbineName,
+            scope.row.warningId,
+            scope.row.standCode,
+            scope.row.newWarningLevel,
+            scope.row.standDes,
+            scope.row.consequence,
+            scope.row.warningLabel,
+            scope.row.priority,
+            scope.row.modelId
+            )">查看</el-link>
         </template>
       </el-table-column>
     </el-table>
@@ -189,6 +233,13 @@ onUnmounted(() => {
         :endTime="detailEndTime"
         :turbineName="detailTurbineName"
         :warningId="detailWarningId"
+        :standCode="detailStandCode"
+        :newWarningLevel="detailNewWarningLevel"
+        :standDes="detailStandDes"
+        :consequence="detailConsequence"
+        :warningLabel="detailWarningLabel"
+        :priority="detailPriority"
+        :modelId="detailModelId"
       />
     </el-dialog>
   </div>

@@ -288,6 +288,11 @@ const detailTurbineName = ref(null)
 const detailWarningId = ref(null)
 const detailStandCode = ref(null)
 const detailNewWarningLevel = ref(null)
+const detailStandDes = ref(null)
+const detailConsequence = ref(null)
+const detailWarningLabel = ref(null)
+const detailPriority = ref(null)
+const detailModelId = ref(null)
 const look = (
   turbineId,
   warningDescription,
@@ -298,7 +303,12 @@ const look = (
   turbineName,
   warningId,
   standCode,
-  newWarningLevel
+  newWarningLevel,
+  standDes,
+  consequence,
+  warningLabel,
+  priority,
+  modelId
 ) => {
   detailTurbineId.value = turbineId
   detailWarningDescription.value = warningDescription
@@ -310,6 +320,11 @@ const look = (
   detailWarningId.value = warningId
   detailStandCode.value = standCode
   detailNewWarningLevel.value = newWarningLevel
+  detailStandDes.value = standDes
+  detailConsequence.value = consequence
+  detailWarningLabel.value = warningLabel
+  detailPriority.value = priority
+  detailModelId.value = modelId
   lookDialogVisible.value = true
 }
 </script>
@@ -409,7 +424,7 @@ const look = (
       <div class="search-section">
         <el-input
             v-model="searchDescription"
-            placeholder="请输入关键字搜索"
+            placeholder="请输入预警信息关键字搜索"
             clearable          style="width: 200px; margin-right: 10px"
             @keyup.enter="handleSearch"
         />
@@ -492,7 +507,12 @@ const look = (
                 scope.row.turbineName,
                 scope.row.warningId,
                 scope.row.standCode,
-                scope.row.newWarningLevel
+                scope.row.newWarningLevel,
+                scope.row.standDes,
+                scope.row.consequence,
+                scope.row.warningLabel,
+                scope.row.priority,
+                scope.row.modelId
               )
             "
             >查看</el-link
@@ -530,6 +550,11 @@ const look = (
         :warningId="detailWarningId"
         :standCode="detailStandCode"
         :newWarningLevel="detailNewWarningLevel"
+        :standDes="detailStandDes"
+        :consequence="detailConsequence"
+        :warningLabel="detailWarningLabel"
+        :priority="detailPriority"
+        :modelId="detailModelId"
       />
     </el-dialog>
   </div>

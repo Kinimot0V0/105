@@ -51,6 +51,26 @@ const props = defineProps({
   newWarningLevel: {
     type: String,
     default: ''
+  },
+  standDes: {
+    type: String,
+    default: ''
+  },
+  consequence: {
+    type: String,
+    default: ''
+  },
+  warningLabel: {
+    type: String,
+    default: ''
+  },
+  priority: {
+    type: String,
+    default: ''
+  },
+  modelId: {
+    type: Number,
+    default: ''
   }
 })
 const windFarmName=ref(null)
@@ -724,13 +744,25 @@ onMounted(() => {
           <!-- 顶部基础信息（竖向排列） -->
           <div class="info-grid">
             <el-descriptions :column="2" border >
-              <el-descriptions-item label="预警信息">{{ props.warningDescription.replace(/[\[\]']+/g, '')}}</el-descriptions-item>
-              <el-descriptions-item label="预警设备">{{ windFarmName }}-{{ props.turbineName }}</el-descriptions-item>
-              <el-descriptions-item label="预警状态"><el-tag type="danger">{{ statusMap[props.warningStatus]?.label}}</el-tag></el-descriptions-item>
+              <el-descriptions-item label="预警信息">{{ props.warningDescription.replace(/[\[\]']+/g, '')}}-{{ props.standCode }}-M{{ props.modelId.toString().padStart(4, '0') }}</el-descriptions-item>
+              <el-descriptions-item label="风机名称">{{ windFarmName }}-{{ props.turbineName }}</el-descriptions-item>
+              <el-descriptions-item label="预警状态">
+                <span
+                  :style="{
+                      color: statusMap[props.warningStatus]?.color || 'black'
+                  }"
+                  >
+                 {{ statusMap[props.warningStatus]?.label || '未处理' }}
+                </span>
+              </el-descriptions-item>
               <el-descriptions-item label="管理分级">{{ props.newWarningLevel }}</el-descriptions-item>
-              <el-descriptions-item label="故障编码">{{ props.standCode }}</el-descriptions-item>
-              <el-descriptions-item label="开始时间">{{ props.startTime.replace('T', ' ') }}</el-descriptions-item>
-              <el-descriptions-item label="结束时间">{{ props.endTime.replace('T', ' ') }}</el-descriptions-item>
+              <!-- <el-descriptions-item label="故障编码">{{ props.standCode }}</el-descriptions-item> -->
+              <el-descriptions-item label="所属设备">{{ props.standDes }}</el-descriptions-item>
+              <el-descriptions-item label="可能影响后果">{{ props.consequence }}</el-descriptions-item>
+              <el-descriptions-item label="缺陷分类">{{ props.warningLabel }}</el-descriptions-item>
+              <el-descriptions-item label="维修优先级">{{ props.priority }}</el-descriptions-item>
+              <el-descriptions-item label="开始时间——结束时间">{{ props.startTime.replace('T', ' ') }} —— {{ props.endTime.replace('T',' ') }}</el-descriptions-item>
+              <!-- <el-descriptions-item label="结束时间">{{ props.endTime.replace('T', ' ') }}</el-descriptions-item> -->
               <el-descriptions-item label="关键测点">液压系统压力</el-descriptions-item>
               <el-descriptions-item label="预警原因">液压系统频繁低压</el-descriptions-item>
             </el-descriptions>
