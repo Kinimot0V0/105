@@ -179,6 +179,7 @@ const getWarningData = async () => {
     }
             // 添加描述搜索参数
     if (searchDescription.value) params.warnDescription = searchDescription.value
+    
     if (pvFarmId.value) params.pvFarmId = pvFarmId.value
     if (inverterId.value) params.inverterId = inverterId.value
     if (combinerId.value) params.combinerId = combinerId.value
