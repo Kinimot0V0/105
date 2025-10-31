@@ -135,52 +135,115 @@ const getWarningData = async () => {
     }
 
     const response = await getWarning(params)
-    const data = response.data.result
-    // console.log('getWarning返回', response)
-    const warnings = data.warningList
+    const data = response.data.result || {}
 
-    // 获取电站名称并合并到预警项
-    const farmNameCache = {}
-    const updatedWarnings = await Promise.all(
-      warnings.map(async (warning) => {
-        const deviceId = warning.deviceId
-        const deviceType = warning.modelType
+    // 如果后端仍返回扁平 warningList（兼容老逻辑）
+    if (Array.isArray(data.warningList)) {
+      warningList.value = data.warningList
+      totalCount.value = data.total_count ?? warningList.value.length
+      page.value = data.page ?? page.value
+      totalPages.value = data.total_pages ?? Math.ceil(totalCount.value / pageSize.value)
+      return
+    }
 
-        // 创建唯一缓存键
-        const cacheKey = `${deviceType}:${deviceId}`
-
-        if (farmNameCache[cacheKey]) {
-          return { ...warning, pvFarmName: farmNameCache[cacheKey] }
-        }
-
-        try {
-          // 修正参数传递（使用正确的字段名）
-          const farmResponse = await getFarmInfo({
-            deviceId,
-            deviceType
-          })
-
-          // 检查响应结构（根据实际响应调整）
-          const result = farmResponse.data?.result || {}
-          const pvFarmName = result.pvFarmName || '未知电站'
-
-          farmNameCache[cacheKey] = pvFarmName
-          return { ...warning, pvFarmName }
-        } catch (error) {
-          console.error('场站信息获取失败', { deviceId, deviceType, error })
-          return { ...warning, pvFarmName: '未知电站' }
-        }
+    // 后端按组返回（modelGroupList），将各组的 warningList 扁平化为 overview 使用的列表
+    if (Array.isArray(data.modelGroupList)) {
+      const flat = data.modelGroupList.flatMap((grp) => {
+        const grpPvFarm = grp.pvFarmName
+        // 把组内每条预警展开并保证 pvFarmName、deviceName 等字段存在
+        return (grp.warningList || []).map((item) => ({
+          pvFarmName: item.pvFarmName ?? grpPvFarm,
+          deviceName: item.deviceName ?? grp.deviceName,
+          startTime: item.startTime,
+          endTime: item.endTime,
+          warningDescription: item.warningDescription ?? grp.warningDescription,
+          warningLevel: item.warningLevel,
+          warningStatus: item.warningStatus,
+          modelType: item.modelType,
+          deviceId: item.deviceId,
+          warningId: item.warningId
+        }))
       })
-    )
-    warningList.value = updatedWarnings
 
-    totalCount.value = data.total_count
-    page.value = data.page
-    totalPages.value = data.total_pages
+      warningList.value = flat
+
+      // 使用后端返回的分页/计数信息（如果后端的 total_count/ page/ total_pages 是按组统计，
+      // 依然保留后端数值以保持分页控件与后端一致；否则回退到本地计算）
+      totalCount.value = data.total_count ?? warningList.value.length
+      page.value = data.page ?? page.value
+      totalPages.value = data.total_pages ?? Math.ceil(totalCount.value / pageSize.value)
+      return
+    }
+
+    // 兜底
+    warningList.value = []
+    totalCount.value = 0
+    totalPages.value = 0
   } catch (error) {
     console.error('获取预警数据失败:', error)
   }
 }
+
+// const getWarningData = async () => {
+//   try {
+//     const params = {
+//       page: page.value,
+//       pageSize: pageSize.value,
+//       startDate: startDate.value,
+//       endDate: endDate.value,
+//       companyId: companyId.value
+//     }
+//     if (id.value != -1) {
+//       params.pvFarmId = id.value
+//     }
+
+//     const response = await getWarning(params)
+//     const data = response.data.result
+//     // console.log('getWarning返回', response)
+//     const warnings = data.warningList
+
+//     // 获取电站名称并合并到预警项
+//     const farmNameCache = {}
+//     const updatedWarnings = await Promise.all(
+//       warnings.map(async (warning) => {
+//         const deviceId = warning.deviceId
+//         const deviceType = warning.modelType
+
+//         // 创建唯一缓存键
+//         const cacheKey = `${deviceType}:${deviceId}`
+
+//         if (farmNameCache[cacheKey]) {
+//           return { ...warning, pvFarmName: farmNameCache[cacheKey] }
+//         }
+
+//         try {
+//           // 修正参数传递（使用正确的字段名）
+//           const farmResponse = await getFarmInfo({
+//             deviceId,
+//             deviceType
+//           })
+
+//           // 检查响应结构（根据实际响应调整）
+//           const result = farmResponse.data?.result || {}
+//           const pvFarmName = result.pvFarmName || '未知电站'
+
+//           farmNameCache[cacheKey] = pvFarmName
+//           return { ...warning, pvFarmName }
+//         } catch (error) {
+//           console.error('场站信息获取失败', { deviceId, deviceType, error })
+//           return { ...warning, pvFarmName: '未知电站' }
+//         }
+//       })
+//     )
+//     warningList.value = updatedWarnings
+
+//     totalCount.value = data.total_count
+//     page.value = data.page
+//     totalPages.value = data.total_pages
+//   } catch (error) {
+//     console.error('获取预警数据失败:', error)
+//   }
+// }
 
 //设备矩阵相关
 // const deviceWarnList = ref([])

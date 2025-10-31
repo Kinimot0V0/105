@@ -10,6 +10,7 @@ import { toRaw } from 'vue'
 
 const expandedData = ref({})        // 缓存展开的明细
 const expandedLoading = ref({})     // 可用于加载状态
+const groupedFromApi = ref([])
 // 公司相关变量
 import { getCompany } from '@/api/company'
 // 公司相关变量
@@ -172,67 +173,39 @@ const getWarningData = async () => {
       companyId: companyId.value,
       page: page.value,
       //pageSize: pageSize.value,
-      pageSize: 99999,
+      pageSize: 100,
       startDate: startDate.value,
       endDate: endDate.value,
       sort_direction: 'asc'
     }
-            // 添加描述搜索参数
+    // 添加描述搜索参数
     if (searchDescription.value) params.warnDescription = searchDescription.value
-    
+
     if (pvFarmId.value) params.pvFarmId = pvFarmId.value
     if (inverterId.value) params.inverterId = inverterId.value
     if (combinerId.value) params.combinerId = combinerId.value
     if (level.value !== '') params.warningLevel = level.value
 
-    // console.log('getWarningData_params', params)
     const { data } = await getWarning(params)
-    // console.log('getWarningData_返回', data)
-    const warnings = data.result.warningList
+    // 后端已按组返回（modelGroupList）
+    const groups = data.result?.modelGroupList || []
 
-    // 获取电站名称并合并到预警项
-    const farmNameCache = {}
-    const updatedWarnings = await Promise.all(
-      warnings.map(async (warning) => {
-        const deviceId = warning.deviceId
-        const deviceType = warning.modelType
+    // 将后端返回的组转换为前端使用的格式，确保每组包含 _samples（展开明细）
+    groupedFromApi.value = groups.map((g) => ({
+      // 保留后端的 groupId、pvFarmName、deviceName、warningDescription 等字段
+      groupId: g.groupId,
+      pvFarmName: g.pvFarmName || g.pvFarmName,
+      deviceName: g.deviceName || g.deviceName,
+      warningDescription: g.warningDescription || '',
+      // 将原来的 warningList 作为样本数组
+      _samples: (g.warningList || []).map((s) => ({ ...s }))
+    }))
 
-        // 创建唯一缓存键
-        const cacheKey = `${deviceType}:${deviceId}`
+    // 可选：如果仍需扁平列表（不展示分页时可以忽略）
+    warningList.value = [].concat(...groupedFromApi.value.map((g) => g._samples))
 
-        if (farmNameCache[cacheKey]) {
-          return { ...warning, pvFarmName: farmNameCache[cacheKey] }
-        }
-
-        try {
-          // 修正参数传递（使用正确的字段名）
-          const farmResponse = await getFarmInfo({
-            deviceId,
-            deviceType
-          })
-
-          // 检查响应结构（根据实际响应调整）
-          const result = farmResponse.data?.result || {}
-          const pvFarmName = result.pvFarmName || '未知电站'
-
-          farmNameCache[cacheKey] = pvFarmName
-          return { ...warning, pvFarmName }
-        } catch (error) {
-          console.error('场站信息获取失败', { deviceId, deviceType, error })
-          return { ...warning, pvFarmName: '未知电站' }
-        }
-      })
-    )
-    warningList.value = updatedWarnings
-
-    // // warningList.value = data.result.warningList
-    // totalCount.value = data.result.total_count
-    // page.value = data.result.page
-    // totalPages.value = data.result.total_pages
-
-    // 计算分组后的总数并初始化分页信息（前端分页）
-    // groupedWarningList 是一个 computed，修改 warningList 后可以直接读取其值
-    totalCount.value = groupedWarningList.value.length
+    // 分页 & 计数（按组分页）
+    totalCount.value = groupedFromApi.value.length
     page.value = 1
     totalPages.value = Math.ceil(totalCount.value / pageSize.value) || 0
   } catch (e) {
@@ -240,43 +213,26 @@ const getWarningData = async () => {
   }
 }
 
-// 按 warningDescription 对当前页的 warningList 做本地分组
+// 新版：直接使用后端分组数据作为表格数据源
 const groupedWarningList = computed(() => {
-  const map = {};
-  (warningList.value || []).forEach((item) => {
-    const key = item.warningDescription || '未描述'
-    if (!map[key]) {
-      // 把分组行主要字段取自该组第一个元素（可按需调整）
-      map[key] = {
-        warningDescription: key,
-        deviceName: item.deviceName || '',
-        pvFarmName: item.pvFarmName || '',
-        _samples: [item] // 用于统计或取示例
-      }
-    } else {
-      map[key]._samples.push(item)
-    }
-  })
-  return Object.values(map)
+  return groupedFromApi.value || []
 })
 
-// 新增按分组分页的 computed
+// 新增按分组分页的 computed（保持原分页逻辑）
 const paginatedGroups = computed(() => {
   const groups = groupedWarningList.value || []
   const start = (page.value - 1) * pageSize.value
   return groups.slice(start, start + pageSize.value)
 })
 
-// 展开时从当前 warningList 中取出该组的明细（不影响搜索）
+// 展开时直接读取组内的 _samples（后端已返回）
 const handleExpand = async (row) => {
-  const key = row.warningDescription
+  const key = row.groupId
   if (!expandedData.value[key]) {
     try {
       expandedLoading.value[key] = true
-      // 从当前页的 warningList 过滤出同 description 的项
-      const details = (warningList.value || []).filter((it) => it.warningDescription === key)
-      // 深拷贝以避免响应式引用问题
-      expandedData.value[key] = details.map((d) => ({ ...toRaw(d) }))
+      const details = (row._samples || []).map((d) => ({ ...toRaw(d) }))
+      expandedData.value[key] = details
     } catch (e) {
       console.error('组展开失败', e)
     } finally {
@@ -284,6 +240,7 @@ const handleExpand = async (row) => {
     }
   }
 }
+
 
 
 /* ========= 7. 生命周期 ========= */
@@ -446,16 +403,16 @@ watch([combinerId, level, startDate, endDate], () => getWarningData())
      <el-table
       :data="paginatedGroups"
       style="margin-top: 10px"
-      row-key="warningDescription"
+      row-key="groupId"
       height="60vh"
       @expand-change="handleExpand"
     >
-      <el-table-column type="expand">
+      <el-table-column type="expand" label="展开" width="60px">
         <template #default="{ row }">
           <el-table
-            :data="expandedData[row.warningDescription] || []"
+            :data="expandedData[row.groupId] || []"
             height="320"
-            v-loading="expandedLoading[row.warningDescription]"
+            v-loading="expandedLoading[row.groupId]"
             element-loading-text="数据加载中..."
             :show-header="false"
           >

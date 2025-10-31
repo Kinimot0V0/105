@@ -147,6 +147,7 @@ const initDefaultTimeRange = () => {
   endDate.value = formatDate(getCurrentTime())
   startDate.value = formatDate(getDateBefore(7))
 }
+
 const getWarningData = async () => {
   try {
     const params = {
@@ -156,61 +157,117 @@ const getWarningData = async () => {
       startDate: startDate.value,
       endDate: endDate.value
     }
-                // 添加描述搜索参数
     if (searchDescription.value) params.warnDescription = searchDescription.value
     if (pvFarmId.value) params.pvFarmId = pvFarmId.value
     if (inverterId.value) params.inverterId = inverterId.value
     if (combinerId.value) params.combinerId = combinerId.value
     if (level.value !== '') params.warningLevel = level.value
 
-    // console.log('getWarningData_params', params)
     const { data } = await getWarning(params)
-    // console.log('getWarningData_返回', data)
-    const warnings = data.result.warningList
+    const result = data.result || {}
 
-    // 获取电站名称并合并到预警项
-    const farmNameCache = {}
-    const updatedWarnings = await Promise.all(
-      warnings.map(async (warning) => {
-        const deviceId = warning.deviceId
-        const deviceType = warning.modelType
+    // 直接使用后端按组返回的 modelGroupList
+    const groups = Array.isArray(result.modelGroupList) ? result.modelGroupList : []
 
-        // 创建唯一缓存键
-        const cacheKey = `${deviceType}:${deviceId}`
+    // 将组内预警扁平化为实时预警列表，保留 groupId 以便调试/追溯
+    const flat = groups.flatMap((g) => {
+      const grpPv = g.pvFarmName || ''
+      const grpDevice = g.deviceName || ''
+      const grpWarnDesc = g.warningDescription || ''
+      return (g.warningList || []).map((item) => ({
+        groupId: g.groupId,
+        pvFarmName: item.pvFarmName ?? grpPv,
+        deviceName: item.deviceName ?? grpDevice,
+        startTime: item.startTime ?? g.startTime,
+        endTime: item.endTime,
+        warningDescription: item.warningDescription ?? grpWarnDesc,
+        warningLevel: item.warningLevel,
+        warningStatus: item.warningStatus,
+        modelType: item.modelType,
+        deviceId: item.deviceId,
+        warningId: item.warningId
+      }))
+    })
 
-        if (farmNameCache[cacheKey]) {
-          return { ...warning, pvFarmName: farmNameCache[cacheKey] }
-        }
+    warningList.value = flat
 
-        try {
-          // 修正参数传递（使用正确的字段名）
-          const farmResponse = await getFarmInfo({
-            deviceId,
-            deviceType
-          })
-
-          // 检查响应结构（根据实际响应调整）
-          const result = farmResponse.data?.result || {}
-          const pvFarmName = result.pvFarmName || '未知电站'
-
-          farmNameCache[cacheKey] = pvFarmName
-          return { ...warning, pvFarmName }
-        } catch (error) {
-          console.error('场站信息获取失败', { deviceId, deviceType, error })
-          return { ...warning, pvFarmName: '未知电站' }
-        }
-      })
-    )
-    warningList.value = updatedWarnings
-
-    // warningList.value = data.result.warningList
-    totalCount.value = data.result.total_count
-    page.value = data.result.page
-    totalPages.value = data.result.total_pages
+    // 使用后端返回的分页信息
+    totalCount.value = result.total_count ?? warningList.value.length
+    page.value = result.page ?? page.value
+    totalPages.value = result.total_pages ?? Math.ceil(totalCount.value / pageSize.value)
   } catch (e) {
     console.error('获取预警失败', e)
+    warningList.value = []
+    totalCount.value = 0
+    page.value = 1
+    totalPages.value = 0
   }
 }
+
+// const getWarningData = async () => {
+//   try {
+//     const params = {
+//       companyId: companyId.value,
+//       page: page.value,
+//       pageSize: pageSize.value,
+//       startDate: startDate.value,
+//       endDate: endDate.value
+//     }
+//                 // 添加描述搜索参数
+//     if (searchDescription.value) params.warnDescription = searchDescription.value
+//     if (pvFarmId.value) params.pvFarmId = pvFarmId.value
+//     if (inverterId.value) params.inverterId = inverterId.value
+//     if (combinerId.value) params.combinerId = combinerId.value
+//     if (level.value !== '') params.warningLevel = level.value
+
+//     // console.log('getWarningData_params', params)
+//     const { data } = await getWarning(params)
+//     // console.log('getWarningData_返回', data)
+//     const warnings = data.result.warningList
+
+//     // 获取电站名称并合并到预警项
+//     const farmNameCache = {}
+//     const updatedWarnings = await Promise.all(
+//       warnings.map(async (warning) => {
+//         const deviceId = warning.deviceId
+//         const deviceType = warning.modelType
+
+//         // 创建唯一缓存键
+//         const cacheKey = `${deviceType}:${deviceId}`
+
+//         if (farmNameCache[cacheKey]) {
+//           return { ...warning, pvFarmName: farmNameCache[cacheKey] }
+//         }
+
+//         try {
+//           // 修正参数传递（使用正确的字段名）
+//           const farmResponse = await getFarmInfo({
+//             deviceId,
+//             deviceType
+//           })
+
+//           // 检查响应结构（根据实际响应调整）
+//           const result = farmResponse.data?.result || {}
+//           const pvFarmName = result.pvFarmName || '未知电站'
+
+//           farmNameCache[cacheKey] = pvFarmName
+//           return { ...warning, pvFarmName }
+//         } catch (error) {
+//           console.error('场站信息获取失败', { deviceId, deviceType, error })
+//           return { ...warning, pvFarmName: '未知电站' }
+//         }
+//       })
+//     )
+//     warningList.value = updatedWarnings
+
+//     // warningList.value = data.result.warningList
+//     totalCount.value = data.result.total_count
+//     page.value = data.result.page
+//     totalPages.value = data.result.total_pages
+//   } catch (e) {
+//     console.error('获取预警失败', e)
+//   }
+// }
 
 /* ========= 7. 生命周期 ========= */
 onMounted(async () => {
