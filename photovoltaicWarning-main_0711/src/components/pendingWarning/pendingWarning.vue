@@ -274,7 +274,7 @@ const look = (row) => {
         height="70vh"
         @expand-change="handleExpand"
       >
-        <el-table-column type="expand">
+        <el-table-column type="expand" label="展开" width="60px">
           <template #default="{ row }">
             <!-- <el-table
               :data="expandedData[row.warningDescription] || []"
