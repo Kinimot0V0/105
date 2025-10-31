@@ -315,7 +315,7 @@ const look = (
         height="70vh"
         @expand-change="handleExpand"
       >
-        <el-table-column type="expand">
+        <el-table-column type="expand" label="展开" width="60px">
           <template #default="{ row }">
             <!-- <el-table
               :data="expandedData[row.warningDescription] || []"
@@ -333,7 +333,7 @@ const look = (
               :default-sort="{ prop: 'warningStatus', order: 'ascending' }"
             >
               <!-- 表格列配置 -->
-              <el-table-column width="46" align="center"></el-table-column>
+              <el-table-column width="46" align="center" ></el-table-column>
               <el-table-column width="55" align="center">
                 <template #header>选择</template>
                 <template #default="scope">
