@@ -220,6 +220,21 @@ const handleDialogClose = () => {
   currentReportId.value = null
 }
 
+//查询方法
+const handleGet = () => {
+  getReportData()
+  page.value = 1
+}
+
+//重置方法
+const handleReset = () => {
+  windFarmId.value = ''
+  turbineId.value = ''
+  page.value = 1
+  initDefaultTimeRange()
+  getReportData()
+}
+
 // 状态映射
 const statusMap = ref({
   0: { label: '未处理', color: 'red' },
@@ -230,13 +245,13 @@ const statusMap = ref({
 // 监听风场变化，重新获取风机列表
 watch(windFarmId, () => {
   getTurbine()
-  getReportData()
+  // getReportData()
 })
 
 // 监听其他筛选条件变化
-watch([turbineId, startDate, endDate], () => {
-  getReportData()
-})
+// watch([turbineId, startDate, endDate], () => {
+//   getReportData()
+// })
 
 // 初始化时获取风场和风机列表
 onMounted(async () => {
@@ -245,6 +260,7 @@ onMounted(async () => {
   await getWindFarm()
   windFarmId.value = ''
   turbineId.value = ''
+  getReportData()
 })
 const refresh = () => {
   // 重新获取数据
@@ -338,6 +354,14 @@ const handleSizeChange = (size) => {
         :disabledDate="disabledDate"
         @change="validateEndDate"
       ></el-date-picker>
+      <el-button
+            style="background-color: #164b6d; border-color: #164b6d; color: white;"
+            @click="handleGet"
+            class="operation">查询</el-button>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d; color: white; margin-left: 0;"
+            @click="handleReset"
+            class="operation">重置</el-button>
     </div>
     <el-table :data="reportList">
       <el-table-column label="风机名称" align="center">

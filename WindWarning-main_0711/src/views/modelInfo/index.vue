@@ -164,13 +164,13 @@ watch(companyId, () => {
 // 监听风场变化，重新获取风机列表
 watch(windFarmId, () => {
   getTurbine()
-  getModelData()
+  // getModelData()
 })
 
 // 监听筛选条件变化
-watch([turbineId, algorithmId], () => {
-  getModelData()
-})
+// watch([turbineId, algorithmId], () => {
+//   getModelData()
+// })
 
 // 更新分页的当前页
 const handlePageChange = (current_page) => {
@@ -181,6 +181,21 @@ const handlePageChange = (current_page) => {
 // 更新每页显示条数
 const handleSizeChange = (size) => {
   pageSize.value = size
+  page.value = 1
+  getModelData()
+}
+
+//查询方法
+const handleGet = () => {
+  page.value = 1
+  getModelData()
+}
+
+//重置方法
+const handleReset = () => {
+  windFarmId.value = ''
+  turbineId.value = ''
+  algorithmId.value = ''
   page.value = 1
   getModelData()
 }
@@ -468,6 +483,14 @@ const deleteMore = async () => {
             :value="algorithm.algorithmId"
           ></el-option>
         </el-select>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d; color: white; margin-left: 10px;"
+            @click="handleGet"
+            class="operation">查询</el-button>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d; color: white; margin-left: 10px;"
+            @click="handleReset"
+            class="operation">重置</el-button>
       </div>
       <div class="info-button">
         <el-button type="primary" @click="dialogVisible = true"

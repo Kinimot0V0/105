@@ -208,10 +208,22 @@ const handleSearch = () => {
   getWarningData()
 }
 
-// 添加重置搜索方法
+// 添加搜索重置搜索方法
 const resetSearch = () => {
   searchDescription.value = ''
   page.value = 1
+  getWarningData()
+}
+
+// 添加查询重置方法
+const handleReset= () => {
+  searchDescription.value = ''
+  // 恢复默认筛选项
+  windFarmId.value = windFarmList.value[1].windFarmId
+  turbineId.value = ''
+  level.value = ''
+  page.value = 1
+  initDefaultTimeRange()
   getWarningData()
 }
 
@@ -236,18 +248,18 @@ watch(companyId, (newVal) => {
   getWarningData()
 })
 
-// 监听风场变化，重新获取风机列表
+// 监听风场变化,获取风机
 watch(windFarmId, () => {
   getTurbine()
-  getWarningData()
+  // getWarningData()
 })
 
 // 监听其他筛选条件变化
-watch([turbineId, level, startDate, endDate], () => {
-  if (companyId.value) {
-    getWarningData()
-  }
-})
+// watch([turbineId, level, startDate, endDate], () => {
+//   if (companyId.value) {
+//     getWarningData()
+//   }
+// })
 
 // 更新分页的当前页
 const handlePageChange = (current_page) => {
@@ -418,6 +430,14 @@ const look = (
           :disabledDate="disabledDate"
           @change="validateEndDate"
         ></el-date-picker>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d;"
+            @click="handleSearch"
+            class="operation">查询</el-button>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d; margin-left: 0;"
+            @click="handleReset"
+            class="operation">重置</el-button>
       </div>
     </div>
                         <!-- 添加搜索区域 -->
