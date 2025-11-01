@@ -403,6 +403,7 @@ onMounted(() => {
                     ? 'status-closed'
                     : 'status-default'
         ]"
+        :style="{ cursor: (data.label && (data.label.trim() === '办结' || data.label.trim() === '关闭')) ? 'default' : 'pointer' }"
       >
         <div class="status-label-text">{{ data.label }}</div>
 
