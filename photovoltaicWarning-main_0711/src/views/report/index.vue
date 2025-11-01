@@ -195,7 +195,7 @@ const getReportData = async () => {
 
     if (pvFarmId.value) params.pvFarmId = pvFarmId.value
     if (inverterId.value) params.inverterId = inverterId.value
-    if (combinerId.value) params.combinerId = combinerId.value
+    if (combinerId.value) params.combinerBoxId = combinerId.value
     // console.log('getReportData_params', params)
     const response = await getReport(params)
     // console.log('getReportData返回结果:', response)
@@ -263,6 +263,21 @@ const handleDialogClose = () => {
   currentReportId.value = null
 }
 
+const handleGet = () => {
+  page.value = 1
+  getReportData()
+}
+
+const handleReset = () => {
+  initDefaultTimeRange()
+  pvFarmId.value = ''
+  boxId.value = ''
+  inverterId.value = ''
+  combinerId.value = ''
+  page.value = 1
+  getReportData()
+}
+
 // 状态映射
 const statusMap = ref({
   0: { label: '未处理', color: 'red' },
@@ -306,7 +321,7 @@ watch(boxId, (val) => {
   inverterId.value = ''
   combinerList.value = []
   combinerId.value = ''
-  getReportData()
+  // getReportData()
 })
 
 watch(inverterId, (val) => {
@@ -318,16 +333,16 @@ watch(inverterId, (val) => {
       }))
     : []
   combinerId.value = ''
-  getReportData()
+  // getReportData()
 })
 
 watch(pvFarmId, () => {
   resetAllSubLists()
   getDeviceInfo()
-  getReportData()
+  // getReportData()
 })
 
-watch([combinerId, startDate, endDate], () => getReportData())
+// watch([combinerId, startDate, endDate], () => getReportData())
 </script>
 
 <template>
@@ -351,17 +366,17 @@ watch([combinerId, startDate, endDate], () => getReportData())
     </div>
     <div class="filter-line">
       <span class="label">场站</span>
-      <el-select v-model="pvFarmId" class="selector" style="--el-input-text-color: white">
+      <el-select v-model="pvFarmId" class="selector" style="--el-input-text-color: white" placeholder="全部">
         <el-option v-for="f in pvFarmListWithAll" :key="f.id" :label="f.pvFarmName" :value="f.id" />
       </el-select>
 
       <span class="label">箱变</span>
-      <el-select v-model="boxId" class="selector" style="--el-input-text-color: white; width: 110px">
+      <el-select v-model="boxId" class="selector" style="--el-input-text-color: white; width: 110px" placeholder="全部">
         <el-option v-for="b in boxListWithAll" :key="b.boxId" :label="b.boxName" :value="b.boxId" />
       </el-select>
 
       <span class="label">逆变器</span>
-      <el-select v-model="inverterId" class="selector" style="--el-input-text-color: white; width: 180px">
+      <el-select v-model="inverterId" class="selector" style="--el-input-text-color: white; width: 180px" placeholder="全部">
         <el-option
           v-for="inv in inverterListWithAll"
           :key="inv.inverterId"
@@ -371,7 +386,7 @@ watch([combinerId, startDate, endDate], () => getReportData())
       </el-select>
 
       <span class="label">汇流箱</span>
-      <el-select v-model="combinerId" class="selector" style="--el-input-text-color: white; width: 220px">
+      <el-select v-model="combinerId" class="selector" style="--el-input-text-color: white; width: 220px" placeholder="全部">
         <el-option v-for="c in combinerListWithAll" :key="c.combinerId" :label="c.combinerName" :value="c.combinerId" />
       </el-select>
 
@@ -396,6 +411,14 @@ watch([combinerId, startDate, endDate], () => getReportData())
         class="date-picker"
         placeholder="结束时间"
       />
+      <el-button
+            style="background-color: #164b6d; border-color: #164b6d; margin-left: 0; color: white;"
+            @click="handleGet"
+            class="operation">查询</el-button>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d; margin-left: 0px; color: white;"
+            @click="handleReset"
+            class="operation">重置</el-button>
     </div>
     <el-table :data="reportList">
       <el-table-column label="设备名称" align="center">

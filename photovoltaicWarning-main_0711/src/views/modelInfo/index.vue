@@ -106,7 +106,7 @@ watch(boxId, (val) => {
   inverterId.value = ''
   combinerList.value = []
   combinerId.value = ''
-  getModelData()
+  // getModelData()
 })
 
 watch(inverterId, (val) => {
@@ -118,16 +118,16 @@ watch(inverterId, (val) => {
       }))
     : []
   combinerId.value = ''
-  getModelData()
+  // getModelData()
 })
 
 watch(pvFarmId, () => {
   resetAllSubLists()
   getDeviceInfo()
-  getModelData()
+  // getModelData()
 })
 
-watch([combinerId, algorithmId], () => getModelData())
+// watch([combinerId, algorithmId], () => getModelData())
 
 //获取算法信息
 const getAlgList = async () => {
@@ -171,6 +171,23 @@ onMounted(async () => {
   await getPvFarm()
   await getModelData()
 })
+
+//查询方法
+const handleGet = () => {
+  page.value = 1
+  getModelData()
+}
+
+//重置方法
+const handleReset = () => {
+  pvFarmId.value = ''
+  boxId.value = ''
+  inverterId.value = ''
+  combinerId.value = ''
+  algorithmId.value = ''
+  page.value = 1
+  getModelData()
+}
 
 // 更新分页的当前页
 const handlePageChange = (current_page) => {
@@ -407,17 +424,17 @@ const deleteMore = async () => {
     <div class="filter-line">
       <div class="filter-line">
         <span class="span-name">场站</span>
-        <el-select v-model="pvFarmId" class="pv-farm-select" style="--el-input-text-color: white">
+        <el-select v-model="pvFarmId" class="pv-farm-select" style="--el-input-text-color: white" placeholder="全部">
           <el-option v-for="f in pvFarmListWithAll" :key="f.id" :label="f.pvFarmName" :value="f.id" />
         </el-select>
 
         <span class="span-name">箱变</span>
-        <el-select v-model="boxId" class="pv-farm-select" style="--el-input-text-color: white; width: 110px">
+        <el-select v-model="boxId" class="pv-farm-select" style="--el-input-text-color: white; width: 110px" placeholder="全部">
           <el-option v-for="b in boxListWithAll" :key="b.boxId" :label="b.boxName" :value="b.boxId" />
         </el-select>
 
         <span class="span-name">逆变器</span>
-        <el-select v-model="inverterId" class="pv-farm-select" style="--el-input-text-color: white; width: 180px">
+        <el-select v-model="inverterId" class="pv-farm-select" style="--el-input-text-color: white; width: 180px" placeholder="全部">
           <el-option
             v-for="inv in inverterListWithAll"
             :key="inv.inverterId"
@@ -427,7 +444,7 @@ const deleteMore = async () => {
         </el-select>
 
         <span class="span-name">汇流箱</span>
-        <el-select v-model="combinerId" class="pv-farm-select" style="--el-input-text-color: white; width: 220px">
+        <el-select v-model="combinerId" class="pv-farm-select" style="--el-input-text-color: white; width: 220px" placeholder="全部">
           <el-option
             v-for="c in combinerListWithAll"
             :key="c.combinerId"
@@ -452,6 +469,14 @@ const deleteMore = async () => {
             :value="algorithm.algorithmId"
           ></el-option>
         </el-select>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d; color: white; margin-left: 10px;"
+            @click="handleGet"
+            class="operation">查询</el-button>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d; color: white; margin-left: 10px;"
+            @click="handleReset"
+            class="operation">重置</el-button>
       </div>
       <div class="filter-line">
         <el-button type="primary" @click="dialogVisible = true"

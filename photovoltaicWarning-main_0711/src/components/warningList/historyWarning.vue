@@ -151,7 +151,7 @@ watch(boxId, (val) => {
   inverterId.value = ''
   combinerList.value = []
   combinerId.value = ''
-  getWarningData()
+  // getWarningData()
 })
 
 watch(inverterId, (val) => {
@@ -163,7 +163,7 @@ watch(inverterId, (val) => {
       }))
     : []
   combinerId.value = ''
-  getWarningData()
+  // getWarningData()
 })
 
 /* ========= 6. 预警数据 ========= */
@@ -183,7 +183,7 @@ const getWarningData = async () => {
 
     if (pvFarmId.value) params.pvFarmId = pvFarmId.value
     if (inverterId.value) params.inverterId = inverterId.value
-    if (combinerId.value) params.combinerId = combinerId.value
+    if (combinerId.value) params.combinerBoxId = combinerId.value
     if (level.value !== '') params.warningLevel = level.value
 
     const { data } = await getWarning(params)
@@ -265,6 +265,20 @@ const resetSearch = () => {
   page.value = 1
   getWarningData()
 }
+
+//重置方法
+const handleReset = () => {
+  initDefaultTimeRange()
+  searchDescription.value = ''
+  pvFarmId.value = pvFarmList.value[0].id
+  boxId.value = ''
+  inverterId.value = ''
+  combinerId.value = ''
+  level.value = ''
+  page.value = 1
+  getWarningData()
+}
+
 const handlePageChange = (cur) => {
   page.value = cur
   // getWarningData()
@@ -294,10 +308,10 @@ const look = (row) => {
 watch(pvFarmId, () => {
   resetAllSubLists()
   getDeviceInfo()
-  getWarningData()
+  // getWarningData()
 })
 
-watch([combinerId, level, startDate, endDate], () => getWarningData())
+// watch([combinerId, level, startDate, endDate], () => getWarningData())
 </script>
 
 <template>
@@ -347,17 +361,17 @@ watch([combinerId, level, startDate, endDate], () => getWarningData())
     <!-- 全部筛选控件，自动换行 -->
     <div class="filter-line">
       <span class="label">场站</span>
-      <el-select v-model="pvFarmId" class="selector" style="--el-input-text-color: white">
+      <el-select v-model="pvFarmId" class="selector" style="--el-input-text-color: white" placeholder="全部">
         <el-option v-for="f in pvFarmListWithAll" :key="f.id" :label="f.pvFarmName" :value="f.id" />
       </el-select>
 
       <span class="label">箱变</span>
-      <el-select v-model="boxId" class="selector" style="--el-input-text-color: white; width: 110px">
+      <el-select v-model="boxId" class="selector" style="--el-input-text-color: white; width: 110px" placeholder="全部">
         <el-option v-for="b in boxListWithAll" :key="b.boxId" :label="b.boxName" :value="b.boxId" />
       </el-select>
 
       <span class="label">逆变器</span>
-      <el-select v-model="inverterId" class="selector" style="--el-input-text-color: white; width: 180px">
+      <el-select v-model="inverterId" class="selector" style="--el-input-text-color: white; width: 180px" placeholder="全部">
         <el-option
           v-for="inv in inverterListWithAll"
           :key="inv.inverterId"
@@ -367,12 +381,12 @@ watch([combinerId, level, startDate, endDate], () => getWarningData())
       </el-select>
 
       <span class="label">汇流箱</span>
-      <el-select v-model="combinerId" class="selector" style="--el-input-text-color: white; width: 220px">
+      <el-select v-model="combinerId" class="selector" style="--el-input-text-color: white; width: 220px" placeholder="全部">
         <el-option v-for="c in combinerListWithAll" :key="c.combinerId" :label="c.combinerName" :value="c.combinerId" />
       </el-select>
 
       <span class="label">等级</span>
-      <el-select v-model="level" class="selector level-selector" style="--el-input-text-color: white">
+      <el-select v-model="level" class="selector level-selector" style="--el-input-text-color: white" placeholder="全部">
         <el-option v-for="l in levelList" :key="l.levelId" :label="l.levelName" :value="l.levelId" />
       </el-select>
 
@@ -397,6 +411,16 @@ watch([combinerId, level, startDate, endDate], () => getWarningData())
         class="date-picker"
         placeholder="结束时间"
       />
+    </div>
+    <div>
+      <el-button
+            style="background-color: #164b6d; border-color: #164b6d; margin-left: 0;"
+            @click="handleSearch"
+            class="operation">查询</el-button>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d; margin-left: 10px;"
+            @click="handleReset"
+            class="operation">重置</el-button>
     </div>
 
     <!-- 表格 -->

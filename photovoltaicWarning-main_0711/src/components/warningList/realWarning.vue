@@ -108,7 +108,7 @@ watch(boxId, (val) => {
   inverterId.value = ''
   combinerList.value = []
   combinerId.value = ''
-  getWarningData()
+  // getWarningData()
 })
 
 watch(inverterId, (val) => {
@@ -120,7 +120,7 @@ watch(inverterId, (val) => {
       }))
     : []
   combinerId.value = ''
-  getWarningData()
+  // getWarningData()
 })
 
 /* ========= 6. 预警数据 ========= */
@@ -160,7 +160,7 @@ const getWarningData = async () => {
     if (searchDescription.value) params.warnDescription = searchDescription.value
     if (pvFarmId.value) params.pvFarmId = pvFarmId.value
     if (inverterId.value) params.inverterId = inverterId.value
-    if (combinerId.value) params.combinerId = combinerId.value
+    if (combinerId.value) params.combinerBoxId = combinerId.value
     if (level.value !== '') params.warningLevel = level.value
 
     const { data } = await getWarning(params)
@@ -291,6 +291,20 @@ const resetSearch = () => {
   page.value = 1
   getWarningData()
 }
+
+//重置方法
+const handleReset = () => {
+  initDefaultTimeRange()
+  searchDescription.value = ''
+  pvFarmId.value = pvFarmList.value[0].id
+  boxId.value = ''
+  inverterId.value = ''
+  combinerId.value = ''
+  level.value = ''
+  page.value = 1
+  getWarningData()
+}
+
 const handlePageChange = (cur) => {
   page.value = cur
   getWarningData()
@@ -320,10 +334,10 @@ const look = (row) => {
 watch(pvFarmId, () => {
   resetAllSubLists()
   getDeviceInfo()
-  getWarningData()
+  // getWarningData()
 })
 
-watch([combinerId, level], () => getWarningData())
+// watch([combinerId, level], () => getWarningData())
 </script>
 
 <template>
@@ -401,6 +415,14 @@ watch([combinerId, level], () => getWarningData())
       <el-select v-model="level" class="selector level-selector" style="--el-input-text-color: white">
         <el-option v-for="l in levelList" :key="l.levelId" :label="l.levelName" :value="l.levelId" />
       </el-select>
+      <el-button
+            style="background-color: #164b6d; border-color: #164b6d; margin-left: 0;"
+            @click="handleSearch"
+            class="operation">查询</el-button>
+        <el-button
+            style="background-color: #164b6d; border-color: #164b6d; margin-left: 0px;"
+            @click="handleReset"
+            class="operation">重置</el-button>
     </div>
 
     <!-- 表格 -->
