@@ -206,7 +206,7 @@ const handleSizeChange = (size) => {
 const statusMap = ref({
   0: { label: '未训练', color: 'red' },
   1: { label: '训练中', color: 'yellow' },
-  2: { label: '训练完成', color: 'orange' },
+  2: { label: '未开启', color: 'orange' },
   3: { label: '运行中', color: 'green' }
 })
 

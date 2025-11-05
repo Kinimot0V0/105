@@ -20,7 +20,7 @@
     base = 'http://localhost:8083'
   } else {
     // 非本地使用浏览器 origin + 后端路径
-    var backendPath = '/ewsAdmin'
+    var backendPath = '/pvsAdmin'
     base = origin.replace(/\/+$/, '') + backendPath
   }
 

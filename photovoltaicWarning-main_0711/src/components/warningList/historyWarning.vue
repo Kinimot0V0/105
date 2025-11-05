@@ -316,7 +316,7 @@ watch(pvFarmId, () => {
 
 <template>
   <div class="container">
-    <!-- 公司名独占一行 -->
+    <!-- 公司名 -->
     <div class="company-line">
       <span class="label">公司</span>
       <el-select
@@ -333,8 +333,12 @@ watch(pvFarmId, () => {
           :value="company.companyId"
         ></el-option>
       </el-select>
+      <span class="label">场站</span>
+      <el-select v-model="pvFarmId" class="selector" style="--el-input-text-color: white" placeholder="全部">
+        <el-option v-for="f in pvFarmListWithAll" :key="f.id" :label="f.pvFarmName" :value="f.id" />
+      </el-select>
                   <!-- 添加搜索区域 -->
-      <div class="search-section">
+    <div class="search-section" style="padding-left: 1000px;">
         <el-input
             v-model="searchDescription"
             placeholder="请输入预警信息关键字搜索"
@@ -360,10 +364,6 @@ watch(pvFarmId, () => {
 
     <!-- 全部筛选控件，自动换行 -->
     <div class="filter-line">
-      <span class="label">场站</span>
-      <el-select v-model="pvFarmId" class="selector" style="--el-input-text-color: white" placeholder="全部">
-        <el-option v-for="f in pvFarmListWithAll" :key="f.id" :label="f.pvFarmName" :value="f.id" />
-      </el-select>
 
       <span class="label">箱变</span>
       <el-select v-model="boxId" class="selector" style="--el-input-text-color: white; width: 110px" placeholder="全部">
@@ -411,10 +411,9 @@ watch(pvFarmId, () => {
         class="date-picker"
         placeholder="结束时间"
       />
-    </div>
-    <div>
+      <div>
       <el-button
-            style="background-color: #164b6d; border-color: #164b6d; margin-left: 0;"
+            style="background-color: #164b6d; border-color: #164b6d; margin-left: 0px;"
             @click="handleSearch"
             class="operation">查询</el-button>
         <el-button
@@ -422,6 +421,8 @@ watch(pvFarmId, () => {
             @click="handleReset"
             class="operation">重置</el-button>
     </div>
+    </div>
+    
 
     <!-- 表格 -->
      <el-table
