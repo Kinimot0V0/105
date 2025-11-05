@@ -71,6 +71,18 @@ const props = defineProps({
   modelId: {
     type: Number,
     default: ''
+  },
+  algorithmLabel: {
+    type: String,
+    default: ''
+  },
+  keyPoint: {
+    type: String,
+    default: ''
+  },
+  warningReason: {
+    type: String,
+    default: ''
   }
 })
 const windFarmName=ref(null)
@@ -744,7 +756,7 @@ onMounted(() => {
           <!-- 顶部基础信息（竖向排列） -->
           <div class="info-grid">
             <el-descriptions :column="2" border >
-              <el-descriptions-item label="预警信息">{{ props.warningDescription.replace(/[\[\]']+/g, '')}}-{{ props.standCode }}-M{{ props.modelId.toString().padStart(4, '0') }}</el-descriptions-item>
+              <el-descriptions-item label="预警信息">{{ props.warningDescription.replace(/[\[\]']+/g, '')}}_{{ props.standCode }}_{{ props.algorithmLabel }}</el-descriptions-item>
               <el-descriptions-item label="风机名称">{{ windFarmName }}-{{ props.turbineName }}</el-descriptions-item>
               <el-descriptions-item label="预警状态">
                 <span
@@ -763,8 +775,8 @@ onMounted(() => {
               <el-descriptions-item label="维修优先级">{{ props.priority }}</el-descriptions-item>
               <el-descriptions-item label="开始时间——结束时间">{{ props.startTime.replace('T', ' ') }} —— {{ props.endTime.replace('T',' ') }}</el-descriptions-item>
               <!-- <el-descriptions-item label="结束时间">{{ props.endTime.replace('T', ' ') }}</el-descriptions-item> -->
-              <el-descriptions-item label="关键测点">液压系统压力</el-descriptions-item>
-              <el-descriptions-item label="预警原因">液压系统频繁低压</el-descriptions-item>
+              <el-descriptions-item label="关键测点">{{ props.keyPoint }}</el-descriptions-item>
+              <el-descriptions-item label="预警原因">{{ props.warningReason }}</el-descriptions-item>
             </el-descriptions>
             <!-- <div class="info-row">
               <span class="info-label">预警信息</span>

@@ -105,7 +105,7 @@ function modelInfo() {
   </div>
 
   <div class="version-info">
-    版本：20251029
+    版本：20251103
   </div>
 </template>
 

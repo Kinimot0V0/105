@@ -305,6 +305,9 @@ const detailConsequence = ref(null)
 const detailWarningLabel = ref(null)
 const detailPriority = ref(null)
 const detailModelId = ref(null)
+const detailAlgorithmLabel = ref(null)
+const detailKeyPoint = ref(null)
+const detailWarningReason =ref(null)
 const look = (
   turbineId,
   warningDescription,
@@ -320,7 +323,10 @@ const look = (
   consequence,
   warningLabel,
   priority,
-  modelId
+  modelId,
+  algorithmLabel,
+  keyPoint,
+  warningReason
 ) => {
   detailTurbineId.value = turbineId
   detailWarningDescription.value = warningDescription
@@ -337,6 +343,9 @@ const look = (
   detailWarningLabel.value = warningLabel
   detailPriority.value = priority
   detailModelId.value = modelId
+  detailAlgorithmLabel.value = algorithmLabel
+  detailKeyPoint.value = keyPoint
+  detailWarningReason.value = warningReason
   lookDialogVisible.value = true
 }
 </script>
@@ -485,11 +494,11 @@ const look = (
       <el-table-column prop="turbineName" label="风机名称"  align="center"></el-table-column>
       <el-table-column  label="预警信息" align="center">
         <template #default="scope">
-          {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}
+          {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}_{{ scope.row.standCode }}_{{ scope.row.algorithmLabel }}
         </template>
       </el-table-column>
-      <el-table-column prop="standCode" label="故障编码" align="center"></el-table-column>
-      <el-table-column prop="standDes" label="所属系统" align="center"></el-table-column>
+      <!-- <el-table-column prop="standCode" label="故障编码" align="center"></el-table-column> -->
+      <el-table-column prop="standDes" label="所属设备" align="center"></el-table-column>
       <el-table-column prop="newWarningLevel" label="管理分级" align="center"></el-table-column>
       <el-table-column prop="consequence" label="可能影响后果" align="center"></el-table-column>
       <el-table-column prop="warningLabel" label="缺陷分类" align="center"></el-table-column>
@@ -532,7 +541,10 @@ const look = (
                 scope.row.consequence,
                 scope.row.warningLabel,
                 scope.row.priority,
-                scope.row.modelId
+                scope.row.modelId,
+                scope.row.algorithmLabel,
+                scope.row.keyPoint,
+                scope.row.warningReason
               )
             "
             >查看</el-link
@@ -575,6 +587,9 @@ const look = (
         :warningLabel="detailWarningLabel"
         :priority="detailPriority"
         :modelId="detailModelId"
+        :algorithmLabel="detailAlgorithmLabel"
+        :keyPoint="detailKeyPoint"
+        :warningReason="detailWarningReason"
       />
     </el-dialog>
   </div>

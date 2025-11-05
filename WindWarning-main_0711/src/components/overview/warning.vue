@@ -50,6 +50,9 @@ const detailConsequence = ref(null)
 const detailWarningLabel = ref(null)
 const detailPriority = ref(null)
 const detailModelId = ref(null)
+const detailAlgorithmLabel = ref(null)
+const detailKeyPoint = ref(null)
+const detailWarningReason =ref(null)
 const look = (
   turbineId,
   warningDescription,
@@ -65,7 +68,10 @@ const look = (
   consequence,
   warningLabel,
   priority,
-  modelId
+  modelId,
+  algorithmLabel,
+  keyPoint,
+  warningReason
 ) => {
   detailTurbineId.value = turbineId
   detailWarningDescription.value = warningDescription
@@ -82,6 +88,9 @@ const look = (
   detailWarningLabel.value = warningLabel
   detailPriority.value = priority
   detailModelId.value = modelId
+  detailAlgorithmLabel.value = algorithmLabel
+  detailKeyPoint.value = keyPoint
+  detailWarningReason.value = warningReason
   lookDialogVisible.value = true
 }
 
@@ -205,7 +214,10 @@ onUnmounted(() => {
             scope.row.consequence,
             scope.row.warningLabel,
             scope.row.priority,
-            scope.row.modelId
+            scope.row.modelId,
+            scope.row.algorithmLabel,
+            scope.row.keyPoint,
+            scope.row.warningReason
             )">查看</el-link>
         </template>
       </el-table-column>
@@ -240,6 +252,9 @@ onUnmounted(() => {
         :warningLabel="detailWarningLabel"
         :priority="detailPriority"
         :modelId="detailModelId"
+        :algorithmLabel="detailAlgorithmLabel"
+        :keyPoint="detailKeyPoint"
+        :warningReason="detailWarningReason"
       />
     </el-dialog>
   </div>
