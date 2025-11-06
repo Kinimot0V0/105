@@ -107,9 +107,9 @@ function modelInfo() {
     <router-view></router-view>
   </div>
 
-  <div class="version-info">
+  <!-- <div class="version-info">
     版本：20251103
-  </div>
+  </div> -->
 </template>
 
 <style scoped>

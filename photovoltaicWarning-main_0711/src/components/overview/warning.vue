@@ -57,7 +57,7 @@ const statusMap = ref({
 })
 
 // 自动轮播间隔时间（毫秒）
-const CAROUSEL_INTERVAL = 3000
+const CAROUSEL_INTERVAL = 5000
 
 // 自动轮播定时器
 let carouselTimer = null
@@ -115,27 +115,27 @@ onUnmounted(() => {
         </template>
       </el-table-column>
 
-      <el-table-column label="开始时间" align="center">
+      <el-table-column label="开始时间" align="center" width="100px">
         <template #default="scope">
           {{ scope.row.startTime.replace('T', ' ') }}
         </template>
       </el-table-column>
-      <el-table-column label="设备名称" align="center">
+      <el-table-column label="设备名称" align="center" width="140px">
         <template #default="scope"> {{ scope.row.pvFarmName }}-{{ scope.row.deviceName }} </template>
       </el-table-column>
-      <el-table-column  label="预警信息" align="center">
+      <el-table-column  label="预警信息" align="center" width="250px" :show-overflow-tooltip="true">
         <template #default="scope">
           {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}
         </template>
       </el-table-column>
-      <el-table-column prop="warningLevel" label="等级" align="center" width="60px">
+      <el-table-column prop="warningLevel" label="等级" align="center" width="80px">
         <template #default="scope">
           <span>
             {{ levelMap[scope.row.warningLevel]?.label }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column prop="warningStatus" label="状态" align="center" width="90px">
+      <el-table-column prop="warningStatus" label="状态" align="center" width="80px">
         <template #default="scope">
           <span
             :style="{
@@ -146,7 +146,7 @@ onUnmounted(() => {
           </span>
         </template>
       </el-table-column>
-      <el-table-column prop="" label="详情" align="center" width="60px">
+      <el-table-column prop="" label="详情" align="center" width="80px">
         <template #default="scope">
           <el-link type="primary" @click="look(scope.row)">查看</el-link>
         </template>
