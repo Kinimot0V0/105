@@ -370,13 +370,14 @@ const look = (
                     {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}
                 </template>
               </el-table-column>
-              <el-table-column prop="warningLevel" label="等级" width="140px" align="center">
+              <el-table-column prop="newWarningLevel" label="管理分级" align="center"></el-table-column>
+              <!-- <el-table-column prop="warningLevel" label="等级" width="140px" align="center">
                 <template #default="scope">
                   <span :style="{ color: levelMap[scope.row.warningLevel]?.color }">
                     {{ levelMap[scope.row.warningLevel]?.label }}
                   </span>
                 </template>
-              </el-table-column>
+              </el-table-column> -->
               <el-table-column
                 prop="warningStatus"
                 label="状态"

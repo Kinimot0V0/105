@@ -33,10 +33,13 @@ const turbineList = ref([])
 const lookDialogVisible = ref(false)
 
 const level = ref('')
+const newWarningLevel = ref('')
 const levelList = ref([
   { levelId: '', levelName: '全部' },
-  { levelId: 1, levelName: '1级' },
-  { levelId: 2, levelName: '2级' }
+  { levelId: '1级', levelName: '1级' },
+  { levelId: '2级', levelName: '2级' },
+  { levelId: '3级', levelName: '3级' },
+  { levelId: '4级', levelName: '4级' }
 ])
 //时间相关
 const startDate = ref(null)
@@ -145,7 +148,8 @@ const getWarningData = async () => {
 
     if (windFarmId.value) params.windfarm_id = windFarmId.value
     if (turbineId.value) params.turbine_id = turbineId.value
-    if (level.value !== '') params.warning_level = level.value
+    // if (level.value !== '') params.warning_level = level.value
+    if (newWarningLevel.value !== '') params.newWarningLevel = newWarningLevel.value
     const response = await getWarning(params)
     const data = response.data.result
     const warnings = data.warningList
@@ -373,9 +377,9 @@ const look = (
             :value="turbine.turbineId"
           ></el-option>
         </el-select>
-        <span class="span-name">等级</span>
+        <span class="span-name">管理分级</span>
         <el-select
-          v-model="level"
+          v-model="newWarningLevel"
           placeholder="全部"
           value-key="level"
           class="wind-farm-select"
@@ -444,16 +448,17 @@ const look = (
       <el-table-column prop="turbineName" label="风机名称" width="300px" align="center"></el-table-column>
       <el-table-column  label="预警信息" align="center">
         <template #default="scope">
-          {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}
+          {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}_{{ scope.row.standCode }}_{{ scope.row.algorithmLabel }}
         </template>
       </el-table-column>
-      <el-table-column prop="warningLevel" label="等级" width="150px" align="center">
+      <el-table-column prop="newWarningLevel" label="管理分级" align="center"></el-table-column>
+      <!-- <el-table-column prop="warningLevel" label="等级" width="150px" align="center">
         <template #default="scope">
           <span>
             {{ levelMap[scope.row.warningLevel]?.label }}
           </span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column prop="warningStatus" label="状态" width="150px" align="center">
         <template #default="scope">
           <span

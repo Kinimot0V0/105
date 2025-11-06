@@ -110,7 +110,7 @@ const statusMap = ref({
 })
 
 // 自动轮播间隔时间（毫秒）
-const CAROUSEL_INTERVAL = 3000
+const CAROUSEL_INTERVAL = 5000
 
 // 自动轮播定时器
 let carouselTimer = null
@@ -168,25 +168,26 @@ onUnmounted(() => {
         </template>
       </el-table-column>
 
-      <el-table-column label="开始时间" align="center">
+      <el-table-column label="开始时间" align="center" width="100px">
         <template #default="scope">
           {{ scope.row.startTime.replace('T', ' ') }}
         </template>
       </el-table-column>
-      <el-table-column prop="farmTurbineName" label="风机名称" align="center"></el-table-column>
-      <el-table-column  label="预警信息" align="center">
+      <el-table-column prop="farmTurbineName" label="风机名称" align="center" width="140px"></el-table-column>
+      <el-table-column  label="预警信息" align="center" width="250px" :show-overflow-tooltip="true">
         <template #default="scope">
-          {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}
+              {{ scope.row.warningDescription.replace(/[\[\]']+/g, '') }}_{{ scope.row.standCode }}_{{ scope.row.algorithmLabel }}
         </template>
       </el-table-column>
-      <el-table-column prop="warningLevel" label="等级" align="center" width="60px">
+      <el-table-column prop="newWarningLevel" label="管理分级" align="center" width="80px"></el-table-column>
+      <!-- <el-table-column prop="warningLevel" label="等级" align="center" width="60px">
         <template #default="scope">
           <span>
             {{ levelMap[scope.row.warningLevel]?.label}}
           </span>
         </template>
-      </el-table-column>
-      <el-table-column prop="warningStatus" label="状态" align="center" width="100px">
+      </el-table-column> -->
+      <el-table-column prop="warningStatus" label="状态" align="center" width="80px">
         <template #default="scope">
           <span
             :style="{
@@ -197,7 +198,7 @@ onUnmounted(() => {
           </span>
         </template>
       </el-table-column>
-      <el-table-column prop="" label="详情" align="center" width="150px">
+      <el-table-column prop="" label="详情" align="center" width="80px">
         <template #default="scope">
           <el-link type="primary" @click="look(
             scope.row.turbineId,

@@ -28,6 +28,8 @@ const windFarmList = ref([])
 // 时间选择相关
 const startDate = ref(null)
 const endDate = ref(null)
+// 新增：选择范围状态： '7' | '30' | null
+const selectedRange = ref('7') // 默认最近7天高亮
 
 //预警相关
 const warningList = ref([])
@@ -77,12 +79,25 @@ const initDefaultTimeRange = () => {
 const handleRecentSevenDays = () => {
   endDate.value = formatDate(getCurrentTime())
   startDate.value = formatDate(getDateBefore(7))
+  selectedRange.value = '7'
 }
 
 // 最近30天按钮处理
 const handleRecentThirtyDays = () => {
   endDate.value = formatDate(getCurrentTime())
   startDate.value = formatDate(getDateBefore(30))
+  selectedRange.value = '30'
+}
+
+// 判断当前 startDate/endDate 是否为 最近 N 天（允许少量时间偏差）
+const isRecentDays = (days) => {
+  if (!startDate.value || !endDate.value) return false
+  const start = new Date(startDate.value)
+  const end = new Date(endDate.value)
+  const now = getCurrentTime()
+  const targetStart = getDateBefore(days)
+  // 允许 2 秒以内的时间误差
+  return Math.abs(end.getTime() - now.getTime()) < 2000 && Math.abs(start.getTime() - targetStart.getTime()) < 2000
 }
 
 // 时间选择器限制
@@ -227,6 +242,7 @@ const getTurbineWarnData = async () => {
 onMounted(async () => {
   try {
     initDefaultTimeRange()
+    selectedRange.value = '7'
     await getCompanyList()
     await getWindFarm()
   } catch (error) {
@@ -249,6 +265,14 @@ watch(companyId, async (newVal) => {
 })
 // 监听开始时间、结束时间和风场 ID 的变化
 watch([startDate, endDate, windFarmId], () => {
+  if (isRecentDays(7)) {
+    selectedRange.value = '7'
+  } else if (isRecentDays(30)) {
+    selectedRange.value = '30'
+  } else {
+    selectedRange.value = null
+  }
+
   if (windFarmList.value.length && startDate.value && endDate.value) {
     page.value = 1
     getWarningData()
@@ -263,8 +287,8 @@ const handlePageChange = (newPage) => {
 
 <template>
   <div class="time">
-    <el-button type="primary" @click="handleRecentSevenDays">最近7天</el-button>
-    <el-button type="primary" @click="handleRecentThirtyDays">最近30天</el-button>
+    <el-button :class="{ active: selectedRange === '7' }" type="primary" @click="handleRecentSevenDays">最近7天</el-button>
+    <el-button :class="{ active: selectedRange === '30' }" type="primary" @click="handleRecentThirtyDays">最近30天</el-button>
 
     <el-date-picker
       v-model="startDate"
@@ -345,6 +369,11 @@ const handlePageChange = (newPage) => {
   display: flex;
   justify-content: center;
   gap: 10px;
+}
+.time .active {
+  background-color: #f6c555 !important; /* 黄色 */
+  border-color: #f6c555 !important;
+  color: #000 !important;
 }
 .container {
   display: flex;

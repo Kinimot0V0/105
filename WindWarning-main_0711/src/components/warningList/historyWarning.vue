@@ -36,9 +36,13 @@ const lookDialogVisible = ref(false)
 const level = ref('')
 const levelList = ref([
   { levelId: '', levelName: '全部' },
-  { levelId: 1, levelName: '1级' },
-  { levelId: 2, levelName: '2级' }
+  { levelId: '1级', levelName: '1级' },
+  { levelId: '2级', levelName: '2级' },
+  { levelId: '3级', levelName: '3级' },
+  { levelId: '4级', levelName: '4级' },
 ])
+
+const newWarningLevel = ref('')
 
 // 时间选择相关
 const startDate = ref(null)
@@ -169,7 +173,8 @@ const getWarningData = async () => {
 
     if (windFarmId.value) params.windfarm_id = windFarmId.value
     if (turbineId.value) params.turbine_id = turbineId.value
-    if (level.value !== '') params.warning_level = level.value
+    // if (level.value !== '') params.warning_level = level.value
+    if (newWarningLevel.value !== '') params.newWarningLevel = newWarningLevel.value
     // console.log('历史预警参数', params)
     const response = await getWarning(params)
     // console.log('历史预警返回', response)
@@ -399,9 +404,9 @@ const look = (
             :value="turbine.turbineId"
           ></el-option>
         </el-select>
-        <span class="span-name">等级</span>
+        <span class="span-name">管理分级</span>
         <el-select
-          v-model="level"
+          v-model="newWarningLevel"
           placeholder="全部"
           value-key="level"
           class="wind-farm-select"
