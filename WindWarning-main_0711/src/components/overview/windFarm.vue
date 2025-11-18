@@ -1,5 +1,8 @@
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const props = defineProps({
   turbineWarnList: {
@@ -28,6 +31,7 @@ const buttonGroups = computed(() => {
     return {
       name: windFarm.windFarmName,
       buttons: windFarm.warnCountList.map(turbine => ({
+        turbineId: turbine.turbineId,
         label: turbine.turbineNumber,
         warning: turbine.warnCount,
         percentage: maxWarning > 0 
@@ -37,6 +41,16 @@ const buttonGroups = computed(() => {
     }
   })
 })
+
+// 点击风机按钮
+const handleTurbineClick = (turbine) => {
+  router.push({
+    name: 'turbine-detail',
+    query: {
+      turbineId: turbine.turbineId
+    }
+  })
+}
 </script>
 
 <template>
@@ -58,7 +72,7 @@ const buttonGroups = computed(() => {
           :key="buttonIndex" 
           class="button-container"
         >
-          <button>{{ button.label }}</button>
+          <button  @click="handleTurbineClick(button)">{{ button.label }}</button>
           <div class="progress-bar">
             <div 
               class="progress" 

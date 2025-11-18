@@ -53,7 +53,12 @@ const router = createRouter({
               path: 'report',
               name: 'report',
               component: () => import('@/views/report/index.vue')
-            }
+            },
+            {
+              path: 'turbine-detail',
+              name: 'turbine-detail',
+              component: () => import('@/components/overview/turbineDetail.vue')
+            },
           ]
         },
         {
