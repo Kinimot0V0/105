@@ -51,7 +51,7 @@
 
         <!-- 三维风机模型 iframe -->
         <iframe 
-          :src="modelUrl" 
+          :src="baseModelUrl" 
           class="model-frame"
           frameborder="0"
         ></iframe>
@@ -78,10 +78,12 @@
         <div class="warning-section">
           <h3>预警信息列表</h3>
           <el-table :data="filteredWarnings" style="width: 100%">
-            <el-table-column prop="time" label="时间" width="180"></el-table-column>
-            <el-table-column prop="device" label="设备" width="120"></el-table-column>
-            <el-table-column prop="description" label="预警描述"></el-table-column>
-            <el-table-column prop="level" label="等级" width="80"></el-table-column>
+            <el-table-column prop="" label="开始时间" ></el-table-column>
+            <el-table-column prop="" label="结束时间" ></el-table-column>
+            <el-table-column prop="" label="预警信息"></el-table-column>
+            <el-table-column prop="" label="管理分级" ></el-table-column>
+            <el-table-column prop="" label="状态" ></el-table-column>
+            <el-table-column prop="" label="详情" ></el-table-column>
           </el-table>
         </div>
       </div>
@@ -99,6 +101,8 @@ const router = useRouter()
 
 //风机id
 const turbineId = route.query.turbineId
+
+const companyId = ref(Number(sessionStorage.getItem('companyId')) || null)
 
 // 时间选择相关
 const startDate = ref(null)
