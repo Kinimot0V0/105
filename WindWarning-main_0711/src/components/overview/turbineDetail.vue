@@ -222,20 +222,20 @@ const goBack = () => {
 // 三维模型基础URL
 const baseModelUrl = ref('https://simuview.bernouly.com/QProject/FJGraphic/index.html')
 
-// 构造带参数的模型URL
-const modelUrl = computed(() => {
-  // 示例数据：哪些设备有报警
-  const warningDevices = ['01', '03'] // 这些应该从实际数据中获取
+// // 构造带参数的模型URL
+// const modelUrl = computed(() => {
+//   // 示例数据：哪些设备有报警
+//   const warningDevices = ['01', '03'] // 这些应该从实际数据中获取
   
-  // 构造color参数
-  let colorParams = warningDevices.map(code => `color=${code}warning`).join('&')
+//   // 构造color参数
+//   let colorParams = warningDevices.map(code => `color=${code}warning`).join('&')
   
-  // 构造run参数（假设02号设备桨叶正常旋转）
-  let runParam = 'run=02y'
+//   // 构造run参数（假设02号设备桨叶正常旋转）
+//   let runParam = 'run=02y'
   
-  // 组合完整的URL
-  return `${baseModelUrl.value}?${colorParams}&${runParam}`
-})
+//   // 组合完整的URL
+//   return `${baseModelUrl.value}?${colorParams}&${runParam}`
+// })
 
 // 风机基本信息
 const turbineInfo = ref({
