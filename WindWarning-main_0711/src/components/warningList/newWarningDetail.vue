@@ -1019,6 +1019,7 @@ onMounted(() => {
                   最近7天
                 </el-button>
               </div>
+              </div>
             <div v-if="selectedComparePoints.length === 2 && compareScatterData.length">
               <scatter-chart
                   :width="'100%'"
@@ -1030,7 +1031,6 @@ onMounted(() => {
               />
             </div>
             <div v-else class="no-data">请选择两个测点并确保有重合时间点以绘制散点图</div>
-            </div>
           </div>
         </div>
       </div>
@@ -1039,7 +1039,11 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
+.comparison-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
 .comparison-scatter {
   font-size: 16px;
   font-weight: bold;
@@ -1047,7 +1051,7 @@ onMounted(() => {
   background-color: #0d96d1;
   padding: 10px 20px;
   border-radius: 5px;
-  width: 90px;
+  width: 80px;
 }
 .time .active {
   background-color: #f6c555 !important; /* 黄色 */
