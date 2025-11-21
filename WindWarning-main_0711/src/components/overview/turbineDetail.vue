@@ -55,6 +55,7 @@
           class="model-frame"
           frameborder="0"
         ></iframe>
+        <div>提示：CTRL + Q 开启自由视角，W、S、A、D控制前后左右，按住鼠标左键以移动视角，鼠标滚轮控制视角远近</div>
       </div>
 
       <!-- 右侧：信息显示区域 -->
