@@ -4,6 +4,7 @@ import trendChart from '@/components/warningList/trendChart.vue'
 import trendChart2 from '@/components/warningList/trendChart2.vue'
 import trendChart3 from '@/components/warningList/trendChart3.vue'
 import scatterChart from '@/components/warningList/scatterChart.vue'
+import trendChartDualYAxis from './trendChartDualYAxis.vue'
 import { ElTree, ElDatePicker } from 'element-plus'
 import { getTurbineInfo,getTrendData,getFarmInfo,showPictures } from '@/api/warningDetail'
 
@@ -651,14 +652,32 @@ label: 'label'
 }
 
 // 处理复选框选择
+// const handleCheck = (node, checked) => {
+// selectedPoints.value = checked.checkedNodes
+//     .filter(n => !n.children)
+//     .map(n => ({
+//       id: n.id,
+//       name: n.label
+//     }))
+//     getTrend()
+// }
 const handleCheck = (node, checked) => {
-selectedPoints.value = checked.checkedNodes
+  // 限制只能选择两个测点
+  const checkedPoints = checked.checkedNodes
     .filter(n => !n.children)
     .map(n => ({
       id: n.id,
       name: n.label
     }))
-    getTrend()
+
+  if (checkedPoints.length > 2) {
+    ElMessage.warning(`最多只能选择2个测点`)
+    // 保持之前的选择，取消当前选择
+    return
+  }
+
+  selectedPoints.value = checkedPoints
+  getTrend()
 }
 
 onMounted(() => {
@@ -934,7 +953,7 @@ onMounted(() => {
                 </div>
               </div>
               <div class="chart">
-                <trendChart :chartData="chartData" />
+                <trendChartDualYAxis :chartData="chartData" />
               </div>
             </div>
           </div>
