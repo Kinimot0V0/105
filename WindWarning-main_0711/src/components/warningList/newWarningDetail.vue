@@ -8,7 +8,7 @@ import { ElTree, ElDatePicker } from 'element-plus'
 import { getTurbineInfo,getTrendData,getFarmInfo,showPictures } from '@/api/warningDetail'
 
 // 标签页数据
-const tabs = ['预警摘要', '分析测点', '比较分析']
+const tabs = ['趋势图或散点图', '分析测点', '比较分析']
 const activeTab = ref(0)
 
 const props = defineProps({
@@ -101,6 +101,8 @@ const thresholdPicData = ref([])
 // 时间选择相关
 const startDate = ref(null)
 const endDate = ref(null)
+const selectedRange = ref(null) // 默认最近7天高亮
+
 // 格式化日期为字符串
 const formatDate = (date) => {
   if (!date) return null
@@ -696,6 +698,7 @@ watch([startDate, endDate], () => {
 
   startDate.value = formatDate(start)
   endDate.value = formatDate(end)
+  selectedRange.value = type
 }
 
 
@@ -736,23 +739,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="warning-detail-container">
-    <!-- 顶部标签页 -->
-    <div class="tab-header">
-      <div
-          v-for="(tab, index) in tabs"
-          :key="index"
-          :class="['tab-item', activeTab === index ? 'active' : '']"
-          @click="activeTab = index"
-      >
-        {{ tab }}
-      </div>
-    </div>
-
-    <!-- 标签页内容 -->
-    <div class="tab-content">
-      <!-- 第一个标签页：概要 -->
-      <div v-show="activeTab === 0" class="tab-pane">
-        <div class="summary-section">
+    <div class="summary-section">
           <!-- 顶部基础信息（竖向排列） -->
           <div class="info-grid">
             <el-descriptions :column="2" border >
@@ -814,6 +801,23 @@ onMounted(() => {
             </div> -->
           </div>
         </div>
+    <!-- 顶部标签页 -->
+    <div class="tab-header">
+      <div
+          v-for="(tab, index) in tabs"
+          :key="index"
+          :class="['tab-item', activeTab === index ? 'active' : '']"
+          @click="activeTab = index"
+      >
+        {{ tab }}
+      </div>
+    </div>
+
+    <!-- 标签页内容 -->
+    <div class="tab-content">
+      <!-- 第一个标签页：概要 -->
+      <div v-show="activeTab === 0" class="tab-pane">
+      
 
         <!-- 图表区域 -->
         <div class="charts-section">
@@ -918,13 +922,13 @@ onMounted(() => {
                       style="margin-left: 10px;width: 180px;"
                   ></el-date-picker>
 
-                  <el-button @click="setQuickTime('30min')" style="margin-left: 10px" type="primary">
+                  <el-button :class="{ active: selectedRange === '30min' }"  @click="setQuickTime('30min')" style="margin-left: 10px" type="primary">
                     最近30分钟
                   </el-button>
-                  <el-button @click="setQuickTime('1day')" type="primary">
+                  <el-button :class="{ active: selectedRange === '1day' }"  @click="setQuickTime('1day')" type="primary">
                     最近1天
                   </el-button>
-                  <el-button @click="setQuickTime('7day')" type="primary">
+                  <el-button :class="{ active: selectedRange === '7day' }" @click="setQuickTime('7day')" type="primary">
                     最近7天
                   </el-button>
                 </div>
@@ -978,7 +982,43 @@ onMounted(() => {
 
           <!-- 对比散点图 -->
           <div class="right-panel">
-            <div class="chart-title">散点图绘制</div>
+            <div class="comparison-info">
+            <div class="comparison-scatter">散点图绘制</div>
+            <div class="time">
+                <el-date-picker
+                    v-model="startDate"
+                    type="datetime"
+                    placeholder="选择开始时间"
+                    :clearable="true"
+                    format="YYYY-MM-DD HH:mm:ss"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                    :disabledDate="disabledDate"
+                    @change="validateStartDate"
+                    style="margin-left: 20px; margin-right: 10px;width: 180px;"
+                ></el-date-picker
+                >至
+                <el-date-picker
+                    v-model="endDate"
+                    type="datetime"
+                    placeholder="选择结束时间"
+                    :clearable="true"
+                    format="YYYY-MM-DD HH:mm:ss"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                    :disabledDate="disabledDate"
+                    @change="validateEndDate"
+                    style="margin-left: 10px;width: 180px;"
+                ></el-date-picker>
+
+                <el-button :class="{ active: selectedRange === '30min' }" @click="setQuickTime('30min')" style="margin-left: 10px" type="primary">
+                  最近30分钟
+                </el-button>
+                <el-button :class="{ active: selectedRange === '1day' }" @click="setQuickTime('1day')" type="primary">
+                  最近1天
+                </el-button>
+                <el-button :class="{ active: selectedRange === '7day' }" @click="setQuickTime('7day')" type="primary">
+                  最近7天
+                </el-button>
+              </div>
             <div v-if="selectedComparePoints.length === 2 && compareScatterData.length">
               <scatter-chart
                   :width="'100%'"
@@ -990,6 +1030,7 @@ onMounted(() => {
               />
             </div>
             <div v-else class="no-data">请选择两个测点并确保有重合时间点以绘制散点图</div>
+            </div>
           </div>
         </div>
       </div>
@@ -998,6 +1039,21 @@ onMounted(() => {
 </template>
 
 <style scoped>
+
+.comparison-scatter {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: #0d96d1;
+  padding: 10px 20px;
+  border-radius: 5px;
+  width: 90px;
+}
+.time .active {
+  background-color: #f6c555 !important; /* 黄色 */
+  border-color: #f6c555 !important;
+  color: #000 !important;
+}
 .el-descriptions {
   --el-descriptions-item-bordered-label-background: transparent;
   --el-descriptions-table-border: 1px solid #164b6d;
@@ -1022,6 +1078,7 @@ onMounted(() => {
   height: 100vh;
   padding: 20px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* 标签页样式 */
@@ -1049,6 +1106,7 @@ onMounted(() => {
 .tab-content {
   height: calc(100% - 60px);
   overflow-y: auto;
+  overflow: hidden;
 }
 
 .tab-pane {
@@ -1105,6 +1163,7 @@ onMounted(() => {
   display: flex;
   height: calc(100% - 40px);
   gap: 20px;
+  overflow: scroll;
 }
 
 .left-panel {
@@ -1129,6 +1188,7 @@ onMounted(() => {
   display: flex;
   height: calc(100% - 40px);
   gap: 20px;
+  overflow: scroll;
 }
 /* 图表 */
 .chart {

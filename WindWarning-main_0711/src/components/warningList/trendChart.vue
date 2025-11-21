@@ -151,8 +151,8 @@ function renderChart() {
     return
   }
 
-  // 默认只显示前 1/5 范围
-  const partialEnd = minTime + totalRange / 5
+  // 默认显示全部
+  const partialEnd = maxTime
 
   const option = {
     ...baseOption,
